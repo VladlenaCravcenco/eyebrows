@@ -7,7 +7,8 @@ import { PrimaryButton, Stat, plural } from '../components/ui';
 export function WelcomeScreen() {
   const s = useStore();
   const name = firstName(s.user?.name ?? '');
-  const hours = Math.max(1, Math.round(totalMinutes / 60));
+  const hours = Math.max(1, Math.round(totalMinutes() / 60));
+  const lessons = totalLessons();
 
   return (
     <div className="relative flex min-h-dvh flex-col">
@@ -37,7 +38,7 @@ export function WelcomeScreen() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.5 }} className="mt-10 space-y-3">
           <div className="grid grid-cols-3 gap-3">
             <Stat value={courses.length} label={plural(courses.length, 'раздел', 'раздела', 'разделов')} />
-            <Stat value={totalLessons} label={plural(totalLessons, 'урок', 'урока', 'уроков')} />
+            <Stat value={lessons} label={plural(lessons, 'урок', 'урока', 'уроков')} />
             <Stat value={`~${hours} ч`} label="обучения" />
           </div>
           <PrimaryButton onClick={actions.welcomeSeen}>Начать обучение</PrimaryButton>

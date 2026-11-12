@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
 import { CheckCircle2, Search, X } from 'lucide-react';
-import { courses } from '../content/courses';
+import { CATEGORIES, courses } from '../content/courses';
 import { useNav } from '../lib/nav';
 import { courseProgress, useStore } from '../lib/store';
 import { ProgressBar, plural, stagger } from '../components/ui';
 
-const filters = ['Все', 'Старт', 'Обязательно', 'Сервис', 'Регламент'] as const;
+const filters = ['Все', ...CATEGORIES] as const;
 
 export function CoursesScreen() {
   const s = useStore();

@@ -12,7 +12,12 @@ export type Route =
   | { name: 'doc'; docId: string }
   | { name: 'manager' }
   | { name: 'employees' }
-  | { name: 'employee'; employeeId: string };
+  | { name: 'employee'; employeeId: string }
+  | { name: 'content' }
+  | { name: 'editCourse'; courseId: string }
+  | { name: 'editLesson'; courseId: string; lessonId: string }
+  | { name: 'editQuestion'; courseId: string; index: number }
+  | { name: 'editDoc'; docId: string };
 
 type Nav = {
   route: Route;

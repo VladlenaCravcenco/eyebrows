@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { CheckCircle2, Clock, FileText, ListChecks, Lock, Trophy } from 'lucide-react';
-import { courseMinutes, findCourse } from '../content/courses';
+import { courseMinutes, findCourse, isDarkCover } from '../content/courses';
 import { useNav } from '../lib/nav';
 import { courseProgress, lessonsDoneCount, nextLessonIndex, useStore } from '../lib/store';
 import { BackButton, BottomBar, PrimaryButton, ProgressBar, plural, stagger } from '../components/ui';
@@ -16,14 +16,15 @@ export function CourseScreen({ courseId }: { courseId: string }) {
   const next = nextLessonIndex(s, course);
   const allLessonsDone = next >= course.lessons.length;
   const quiz = s.quiz[course.id];
-  const dark = course.id === 'rules';
+  const dark = isDarkCover(course.cover);
 
   const openLesson = (i: number) => nav.push({ name: 'lesson', courseId, lessonId: course.lessons[i]!.id });
   const startQuiz = () => nav.push({ name: 'quiz', courseId });
 
+  const hasQuiz = course.quiz.length > 0;
   const cta = !allLessonsDone
     ? { label: doneCount === 0 ? 'Начать курс' : `Продолжить · урок ${next + 1}`, go: () => openLesson(next) }
-    : !quiz?.passed
+    : hasQuiz && !quiz?.passed
       ? { label: 'Пройти тест', go: startQuiz }
       : null;
 
@@ -95,7 +96,7 @@ export function CourseScreen({ courseId }: { courseId: string }) {
             );
           })}
 
-          <motion.button
+          {hasQuiz && <motion.button
             {...stagger(4 + course.lessons.length)}
             disabled={!allLessonsDone}
             onClick={startQuiz}
@@ -115,7 +116,7 @@ export function CourseScreen({ courseId }: { courseId: string }) {
               </div>
             </div>
             {quiz?.passed && <span style={{ fontSize: 12, color: 'var(--muted-2)' }}>Пересдать</span>}
-          </motion.button>
+          </motion.button>}
         </div>
       </div>
 

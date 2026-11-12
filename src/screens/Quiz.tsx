@@ -15,7 +15,7 @@ export function QuizScreen({ courseId }: { courseId: string }) {
   const [selected, setSelected] = useState<number | null>(null);
   const [revealed, setRevealed] = useState(false);
   const [score, setScore] = useState(0);
-  if (!course) return null;
+  if (!course || !course.quiz[idx]) return null;
 
   const q = course.quiz[idx]!;
   const total = course.quiz.length;

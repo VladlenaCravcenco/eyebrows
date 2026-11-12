@@ -1,5 +1,6 @@
 /**
- * БАЗА ЗНАНИЙ — справочник, куда девочки заглядывают во время работы.
+ * НАЧАЛЬНАЯ БАЗА ЗНАНИЙ — справочник, куда девочки заглядывают во время работы.
+ * После запуска правится в приложении (режим руководителя), версия из базы заменяет эту.
  * Каждый документ = список разделов. Внутри раздела те же блоки, что и в уроках
  * (h, p, tip, warn, list). Тексты ниже — заготовки, замените на свои регламенты.
  */
@@ -14,7 +15,7 @@ export type Doc = {
   sections: { title: string; content: Block[] }[];
 };
 
-export const knowledgeBase: Doc[] = [
+export const defaultKnowledge: Doc[] = [
   {
     id: 'rules', title: 'Внутренний свод правил', desc: 'Полный документ компании', icon: 'book', tag: 'Регламент',
     sections: [
@@ -56,3 +57,11 @@ export const knowledgeBase: Doc[] = [
     ],
   },
 ];
+
+export const DOC_ICONS = ['book', 'shield', 'package', 'sparkles', 'wallet', 'scale'] as const;
+
+/** Актуальная база знаний (из базы данных, если сохранена). Меняется через setKnowledge. */
+export let knowledgeBase: Doc[] = defaultKnowledge;
+export function setKnowledge(next: Doc[]) {
+  knowledgeBase = next;
+}

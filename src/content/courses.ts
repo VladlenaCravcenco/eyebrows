@@ -1,7 +1,10 @@
 /**
- * ВСЕ КУРСЫ, УРОКИ И ТЕСТЫ ЛЕЖАТ ЗДЕСЬ.
+ * НАЧАЛЬНЫЕ КУРСЫ, УРОКИ И ТЕСТЫ.
  *
- * Чтобы добавить урок — скопируйте блок { id, title, ... } и поменяйте текст.
+ * После запуска тексты правятся прямо в приложении: Профиль → Режим руководителя →
+ * «Курсы и тексты». Сохранённая там версия хранится в базе и заменяет эту.
+ * Этот файл используется, пока в базе ничего не сохранено.
+ *
  * Виды блоков внутри урока (content):
  *   h     — подзаголовок
  *   p     — обычный абзац
@@ -38,15 +41,29 @@ export type Course = {
   id: string;
   title: string;
   subtitle: string;
-  category: 'Старт' | 'Обязательно' | 'Сервис' | 'Регламент';
+  category: Category;
   cover: string;
   lessons: Lesson[];
   quiz: Question[];
 };
 
+export const CATEGORIES = ['Старт', 'Обязательно', 'Сервис', 'Регламент'] as const;
+export type Category = (typeof CATEGORIES)[number];
+
+/** Обложки на выбор в редакторе */
+export const COVERS = [
+  'linear-gradient(135deg, #EFE7DC 0%, #D9CFC2 100%)',
+  'linear-gradient(135deg, #E8EEE9 0%, #C9D5CB 100%)',
+  'linear-gradient(135deg, #F1E4E4 0%, #DFC9C9 100%)',
+  'linear-gradient(135deg, #E5E5EA 0%, #C7C7CE 100%)',
+  'linear-gradient(135deg, #E9E6F2 0%, #CFCAE0 100%)',
+  'linear-gradient(135deg, #1A1A1F 0%, #2E2E36 100%)',
+];
+export const isDarkCover = (cover: string) => cover.includes('#1A1A1F');
+
 export const PASS_THRESHOLD = 0.6; // доля верных ответов, чтобы тест засчитался
 
-export const courses: Course[] = [
+export const defaultCourses: Course[] = [
   {
     id: 'onboarding',
     title: 'Онбординг мастера',
@@ -204,8 +221,14 @@ export const courses: Course[] = [
   },
 ];
 
+/** Актуальные курсы (из базы, если там что-то сохранено). Меняется через setCourses. */
+export let courses: Course[] = defaultCourses;
+export function setCourses(next: Course[]) {
+  courses = next;
+}
+
 export const findCourse = (id: string) => courses.find((c) => c.id === id);
 
-export const totalLessons = courses.reduce((s, c) => s + c.lessons.length, 0);
-export const totalMinutes = courses.reduce((s, c) => s + c.lessons.reduce((a, l) => a + l.minutes, 0), 0);
+export const totalLessons = () => courses.reduce((s, c) => s + c.lessons.length, 0);
+export const totalMinutes = () => courses.reduce((s, c) => s + c.lessons.reduce((a, l) => a + l.minutes, 0), 0);
 export const courseMinutes = (c: Course) => c.lessons.reduce((a, l) => a + l.minutes, 0);

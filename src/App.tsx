@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { BottomNav } from './components/BottomNav';
 import { NavProvider, useNav, type Route } from './lib/nav';
 import { useStore } from './lib/store';
+import { useContentVersion } from './content/live';
 import { AuthScreen } from './screens/Auth';
 import { WelcomeScreen } from './screens/Welcome';
 import { HomeScreen } from './screens/Home';
@@ -13,6 +14,13 @@ import { QuizResultScreen } from './screens/QuizResult';
 import { DocScreen, KnowledgeScreen } from './screens/Knowledge';
 import { ProfileScreen } from './screens/Profile';
 import { EmployeeScreen, EmployeesScreen, ManagerScreen } from './manager/Manager';
+import {
+  ContentHomeScreen,
+  CourseEditorScreen,
+  DocEditorScreen,
+  LessonEditorScreen,
+  QuestionEditorScreen,
+} from './manager/editor/screens';
 
 function screenFor(r: Route) {
   switch (r.name) {
@@ -37,6 +45,16 @@ function screenFor(r: Route) {
       return <EmployeesScreen />;
     case 'employee':
       return <EmployeeScreen employeeId={r.employeeId} />;
+    case 'content':
+      return <ContentHomeScreen />;
+    case 'editCourse':
+      return <CourseEditorScreen courseId={r.courseId} />;
+    case 'editLesson':
+      return <LessonEditorScreen courseId={r.courseId} lessonId={r.lessonId} />;
+    case 'editQuestion':
+      return <QuestionEditorScreen courseId={r.courseId} index={r.index} />;
+    case 'editDoc':
+      return <DocEditorScreen docId={r.docId} />;
   }
 }
 
@@ -66,6 +84,7 @@ function Router() {
 
 export default function App() {
   const s = useStore();
+  useContentVersion(); // перерисовать всё, когда руководитель обновил тексты
   return (
     <div className="mx-auto min-h-dvh max-w-[480px] overflow-x-clip bg-white shadow-[0_0_60px_-20px_rgba(0,0,0,0.15)]">
       {!s.user ? (

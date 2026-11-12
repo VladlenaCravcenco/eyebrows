@@ -13,6 +13,8 @@ type WebApp = {
   setBackgroundColor(c: string): void;
   disableVerticalSwipes?: () => void;
   BackButton: { show(): void; hide(): void; onClick(cb: () => void): void; offClick(cb: () => void): void };
+  showConfirm?: (message: string, cb: (ok: boolean) => void) => void;
+  showAlert?: (message: string, cb?: () => void) => void;
   HapticFeedback?: {
     impactOccurred(style: 'light' | 'medium' | 'heavy' | 'rigid' | 'soft'): void;
     notificationOccurred(type: 'error' | 'success' | 'warning'): void;
@@ -59,3 +61,15 @@ export const haptic = {
   success: () => wa?.HapticFeedback?.notificationOccurred('success'),
   error: () => wa?.HapticFeedback?.notificationOccurred('error'),
 };
+
+/** Подтверждение: в Telegram — родное окно, в браузере — confirm */
+export function ask(message: string): Promise<boolean> {
+  if (inTelegram && wa?.showConfirm) return new Promise((r) => wa.showConfirm!(message, r));
+  return Promise.resolve(window.confirm(message));
+}
+
+export function tell(message: string): Promise<void> {
+  if (inTelegram && wa?.showAlert) return new Promise((r) => wa.showAlert!(message, r));
+  window.alert(message);
+  return Promise.resolve();
+}

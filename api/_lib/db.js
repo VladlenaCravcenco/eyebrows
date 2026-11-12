@@ -77,3 +77,18 @@ export async function allUsers() {
     .map((r) => JSON.parse(r))
     .sort((a, b) => a.joined_at.localeCompare(b.joined_at));
 }
+
+/* ---------- Тексты курсов и базы знаний ---------- */
+
+export async function getContent() {
+  const [raw] = await redis(['GET', 'content']);
+  return raw ? JSON.parse(raw) : null;
+}
+
+/** Сохраняет новую версию, предыдущую оставляет в content:prev на случай отката */
+export async function saveContent(content) {
+  const [prev] = await redis(['GET', 'content']);
+  const cmds = [['SET', 'content', JSON.stringify(content)]];
+  if (prev) cmds.push(['SET', 'content:prev', prev]);
+  await redis(...cmds);
+}

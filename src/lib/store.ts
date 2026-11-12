@@ -150,17 +150,20 @@ export function nextLessonIndex(s: State, c: Course) {
 
 /** Процент по курсу: каждый урок + тест считаются одинаковыми шагами. */
 export function courseProgress(s: State, c: Course) {
-  const steps = c.lessons.length + 1;
-  const done = lessonsDoneCount(s, c) + (s.quiz[c.id]?.passed ? 1 : 0);
+  const hasQuiz = c.quiz.length > 0;
+  const steps = c.lessons.length + (hasQuiz ? 1 : 0);
+  if (steps === 0) return 0;
+  const done = lessonsDoneCount(s, c) + (hasQuiz && s.quiz[c.id]?.passed ? 1 : 0);
   return Math.round((done / steps) * 100);
 }
 
 export function overallProgress(s: State) {
+  if (!courses.length) return 0;
   return Math.round(courses.reduce((sum, c) => sum + courseProgress(s, c), 0) / courses.length);
 }
 
 export const coursesCompleted = (s: State) => courses.filter((c) => courseProgress(s, c) === 100).length;
-export const testsPassed = (s: State) => Object.values(s.quiz).filter((q) => q.passed).length;
+export const testsPassed = (s: State) => courses.filter((c) => s.quiz[c.id]?.passed).length;
 export const lessonsTotalDone = (s: State) => courses.reduce((n, c) => n + lessonsDoneCount(s, c), 0);
 
 /** Серия дней подряд (сегодня или вчера должен быть активным). */

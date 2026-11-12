@@ -4,6 +4,7 @@ import App from './App';
 import { actions, getState } from './lib/store';
 import { initTelegram, telegramUser } from './lib/telegram';
 import { startSync } from './lib/sync';
+import { loadContent } from './content/live';
 import './styles.css';
 
 initTelegram();
@@ -18,6 +19,7 @@ if (tg) {
   }
 }
 
+void loadContent();
 void startSync();
 
 createRoot(document.getElementById('root')!).render(

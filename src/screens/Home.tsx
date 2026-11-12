@@ -76,7 +76,7 @@ export function HomeScreen() {
           <div className="h-6 w-px bg-white/15" />
           <div>
             <div style={{ color: 'rgba(255,255,255,0.5)' }}>Тестов сдано</div>
-            <div style={{ fontWeight: 500, marginTop: 2 }}>{testsPassed(s)} из {courses.length}</div>
+            <div style={{ fontWeight: 500, marginTop: 2 }}>{testsPassed(s)} из {courses.filter((c) => c.quiz.length).length}</div>
           </div>
         </div>
       </motion.div>

@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import { motion } from 'motion/react';
-import { ArrowUpRight, BookOpen, CheckCircle2, Circle, Clock, Pencil, Search, TrendingUp, Users } from 'lucide-react';
+import { ArrowUpRight, CheckCircle2, Circle, Clock, Pencil, Search, TrendingUp, Users } from 'lucide-react';
 import { brand } from '../content/brand';
 import { courses } from '../content/courses';
 import { useNav } from '../lib/nav';
@@ -131,13 +131,13 @@ export function ManagerScreen() {
             <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>{list.length} {plural(list.length, 'человек', 'человека', 'человек')}</div>
           </div>
         </motion.button>
-        <motion.div {...stagger(2)} className="flex flex-col items-start gap-3 rounded-2xl border border-black/5 bg-white p-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-black/5"><BookOpen size={18} /></div>
+        <motion.button {...stagger(2)} onClick={() => nav.push({ name: 'content' })} className="press flex flex-col items-start gap-3 rounded-2xl border border-black/5 bg-white p-4 text-left">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-black text-white"><Pencil size={17} /></div>
           <div>
-            <div style={{ fontWeight: 500 }}>Курсы</div>
-            <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>{courses.length} {plural(courses.length, 'раздел', 'раздела', 'разделов')}</div>
+            <div style={{ fontWeight: 500 }}>Курсы и тексты</div>
+            <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>{courses.length} {plural(courses.length, 'курс', 'курса', 'курсов')} · редактировать</div>
           </div>
-        </motion.div>
+        </motion.button>
       </div>
 
       {attention.length > 0 && (

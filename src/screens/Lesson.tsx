@@ -19,7 +19,8 @@ export function LessonScreen({ courseId, lessonId }: { courseId: string; lessonI
   if (!lesson) return null;
   const isLast = index === course.lessons.length - 1;
   const alreadyDone = (s.lessonsDone[courseId] ?? []).includes(lessonId);
-  const quizPassed = !!s.quiz[courseId]?.passed;
+  // нет теста — после последнего урока просто возвращаемся к курсу
+  const quizPassed = !!s.quiz[courseId]?.passed || course.quiz.length === 0;
 
   const checks = lesson.content.map((b, i) => (b.kind === 'check' ? i : -1)).filter((i) => i >= 0);
   const allChecked = alreadyDone || checks.every((i) => checked.has(i));
