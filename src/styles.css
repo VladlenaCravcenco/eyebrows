@@ -1,0 +1,42 @@
+@import 'tailwindcss';
+
+:root {
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* Fraunces красиво рисует цифры; кириллицы в нём нет — она падает на Inter */
+  --font-display: 'Fraunces', 'Inter', system-ui, sans-serif;
+  --muted: #9a9a9a;
+  --muted-2: #6b6b6b;
+  --gold: #9a8a6b;
+  --cream: #faf7f1;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+html {
+  background: #f5f2ec;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: #111;
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.011em;
+  overscroll-behavior-y: none;
+}
+
+html.tg, html.tg body { background: #fff; }
+
+button { cursor: pointer; -webkit-user-select: none; user-select: none; }
+button:disabled { cursor: default; }
+input { font: inherit; }
+
+.font-display { font-family: var(--font-display); letter-spacing: -0.025em; font-weight: 500; }
+.eyebrow { font-size: 11px; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; }
+.pt-safe { padding-top: max(var(--safe-top), 0px); }
+.pb-safe { padding-bottom: max(var(--safe-bottom), 12px); }
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.press { transition: transform 0.15s ease; }
+.press:active { transform: scale(0.98); }

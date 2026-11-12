@@ -1,0 +1,61 @@
+/**
+ * Тонкая обёртка над Telegram Mini App SDK.
+ * Если приложение открыто в обычном браузере — все функции просто ничего не делают.
+ */
+type TgUser = { id: number; first_name: string; last_name?: string; username?: string };
+
+type WebApp = {
+  initData: string;
+  initDataUnsafe: { user?: TgUser };
+  ready(): void;
+  expand(): void;
+  setHeaderColor(c: string): void;
+  setBackgroundColor(c: string): void;
+  disableVerticalSwipes?: () => void;
+  BackButton: { show(): void; hide(): void; onClick(cb: () => void): void; offClick(cb: () => void): void };
+  HapticFeedback?: {
+    impactOccurred(style: 'light' | 'medium' | 'heavy' | 'rigid' | 'soft'): void;
+    notificationOccurred(type: 'error' | 'success' | 'warning'): void;
+    selectionChanged(): void;
+  };
+};
+
+const wa: WebApp | undefined = (window as unknown as { Telegram?: { WebApp?: WebApp } }).Telegram?.WebApp;
+
+/** true, если открыто внутри Telegram */
+export const inTelegram = !!wa?.initData;
+
+/** Подписанные Telegram данные — сервер по ним проверяет, кто зашёл */
+export const initData = wa?.initData ?? '';
+
+export function initTelegram() {
+  if (!inTelegram || !wa) return;
+  wa.ready();
+  wa.expand();
+  wa.setHeaderColor('#ffffff');
+  wa.setBackgroundColor('#ffffff');
+  wa.disableVerticalSwipes?.();
+  document.documentElement.classList.add('tg');
+}
+
+export function telegramUser() {
+  const u = wa?.initDataUnsafe.user;
+  if (!inTelegram || !u) return null;
+  return { name: [u.first_name, u.last_name].filter(Boolean).join(' '), telegramId: u.id };
+}
+
+export function setBackButton(visible: boolean, onClick: () => void) {
+  if (!inTelegram || !wa) return () => {};
+  if (visible) {
+    wa.BackButton.show();
+    wa.BackButton.onClick(onClick);
+  } else wa.BackButton.hide();
+  return () => wa.BackButton.offClick(onClick);
+}
+
+export const haptic = {
+  tap: () => wa?.HapticFeedback?.impactOccurred('light'),
+  select: () => wa?.HapticFeedback?.selectionChanged(),
+  success: () => wa?.HapticFeedback?.notificationOccurred('success'),
+  error: () => wa?.HapticFeedback?.notificationOccurred('error'),
+};
