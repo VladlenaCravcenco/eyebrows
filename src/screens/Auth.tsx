@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { L } from '../lib/i18n';
 import { AnimatePresence, motion } from 'motion/react';
 import { Sparkles } from 'lucide-react';
 import { brand } from '../content/brand';
@@ -41,9 +42,9 @@ export function AuthScreen() {
           </div>
           <div className="mt-[18vh]">
             <h1 className="font-display" style={{ fontSize: 40, lineHeight: 1.05 }}>
-              Добро
+              {L('Добро', 'Welcome')}
               <br />
-              пожаловать.
+              {L('пожаловать.', 'aboard.')}
             </h1>
             <p className="mt-3 max-w-[280px]" style={{ color: 'var(--muted-2)', lineHeight: 1.5 }}>
               {brand.tagline}
@@ -66,7 +67,7 @@ export function AuthScreen() {
                   if (phoneOk) setStep('name');
                 }}
               >
-                <label htmlFor="phone" style={{ fontSize: 13, color: 'var(--muted-2)' }}>Номер телефона</label>
+                <label htmlFor="phone" style={{ fontSize: 13, color: 'var(--muted-2)' }}>{L('Номер телефона', 'Phone number')}</label>
                 <div className="rounded-2xl border border-black/10 bg-white px-5 py-4 focus-within:border-black">
                   <input
                     id="phone"
@@ -82,10 +83,10 @@ export function AuthScreen() {
                     style={{ fontSize: 17, letterSpacing: '0.01em' }}
                   />
                 </div>
-                <PrimaryButton disabled={!phoneOk} onClick={() => setStep('name')}>Продолжить</PrimaryButton>
+                <PrimaryButton disabled={!phoneOk} onClick={() => setStep('name')}>{L('Продолжить', 'Continue')}</PrimaryButton>
                 <p className="text-center" style={{ fontSize: 12, color: 'var(--muted)' }}>
-                  Продолжая, вы соглашаетесь
-                  <br />с условиями обработки данных
+                  {L('Продолжая, вы соглашаетесь', 'By continuing, you agree')}
+                  <br />{L('с условиями обработки данных', 'to the data processing terms')}
                 </p>
               </motion.form>
             ) : (
@@ -102,7 +103,7 @@ export function AuthScreen() {
                 }}
               >
                 <div>
-                  <label htmlFor="name" style={{ fontSize: 13, color: 'var(--muted-2)' }}>Как вас зовут?</label>
+                  <label htmlFor="name" style={{ fontSize: 13, color: 'var(--muted-2)' }}>{L('Как вас зовут?', 'What is your name?')}</label>
                   <p className="mt-1" style={{ fontSize: 13, color: 'var(--muted)' }}>{formatPhone(digits)}</p>
                 </div>
                 <div className="rounded-2xl border border-black/10 bg-white px-5 py-4 focus-within:border-black">
@@ -110,7 +111,7 @@ export function AuthScreen() {
                     id="name"
                     autoFocus
                     autoComplete="name"
-                    placeholder="Имя и фамилия"
+                    placeholder={L('Имя и фамилия', 'Full name')}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="w-full bg-transparent outline-none placeholder:text-black/30"
@@ -118,10 +119,10 @@ export function AuthScreen() {
                   />
                 </div>
                 <PrimaryButton disabled={!nameOk} onClick={() => actions.login({ name: name.trim(), phone: formatPhone(digits) })}>
-                  Войти
+                  {L('Войти', 'Sign in')}
                 </PrimaryButton>
                 <button type="button" onClick={() => setStep('phone')} className="w-full text-center" style={{ fontSize: 13, color: 'var(--muted-2)' }}>
-                  Изменить номер
+                  {L('Изменить номер', 'Change number')}
                 </button>
               </motion.form>
             )}

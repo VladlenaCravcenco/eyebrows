@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import type { Block } from '../content/courses';
 import { haptic } from '../lib/telegram';
 import { useStore } from '../lib/store';
+import { L, en } from '../lib/i18n';
 
 export function PrimaryButton({
   children,
@@ -52,7 +53,7 @@ export function BackButton({ onClick, glass }: { onClick: () => void; glass?: bo
   return (
     <button
       onClick={onClick}
-      aria-label="Назад"
+      aria-label={L('Назад', 'Back')}
       className={`press flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
         glass ? 'bg-white/80 backdrop-blur' : 'bg-black/5'
       }`}
@@ -139,7 +140,7 @@ export function ContentBlock({ block }: { block: Block }) {
       return (
         <div className="rounded-2xl border border-black/5 p-4" style={{ background: 'var(--cream)' }}>
           <div className="eyebrow flex items-center gap-2" style={{ color: 'var(--gold)' }}>
-            <Sparkles size={12} /> Важно
+            <Sparkles size={12} /> {L('Важно', 'Important')}
           </div>
           <p className="mt-2" style={{ color: '#3a3a3a', lineHeight: 1.55 }}>{block.text}</p>
         </div>
@@ -148,7 +149,7 @@ export function ContentBlock({ block }: { block: Block }) {
       return (
         <div className="rounded-2xl border border-red-500/15 bg-red-50/60 p-4">
           <div className="eyebrow flex items-center gap-2" style={{ color: '#b54444' }}>
-            <TriangleAlert size={12} /> Нельзя
+            <TriangleAlert size={12} /> {L('Нельзя', 'Never')}
           </div>
           <p className="mt-2" style={{ color: '#3a3a3a', lineHeight: 1.55 }}>{block.text}</p>
         </div>
@@ -169,7 +170,9 @@ export const stagger = (i: number) => ({
   transition: { delay: 0.04 * i, duration: 0.35, ease: [0.22, 1, 0.36, 1] as const },
 });
 
-export function plural(n: number, one: string, few: string, many: string) {
+/** Склонение по числу. Для английского — последние два аргумента (one / many). */
+export function plural(n: number, one: string, few: string, many: string, enOne?: string, enMany?: string) {
+  if (en && enOne) return n === 1 ? enOne : enMany ?? enOne;
   const m10 = n % 10;
   const m100 = n % 100;
   if (m10 === 1 && m100 !== 11) return one;

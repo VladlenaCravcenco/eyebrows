@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { L } from '../lib/i18n';
 import { AnimatePresence, motion } from 'motion/react';
 import { Check, X } from 'lucide-react';
 import { findCourse } from '../content/courses';
@@ -45,7 +46,7 @@ export function QuizScreen({ courseId }: { courseId: string }) {
   return (
     <div className="flex min-h-dvh flex-col">
       <Watermark />
-      <StepHeader label={`Тест · Вопрос ${idx + 1} из ${total}`} steps={total} current={revealed ? idx + 1 : idx} onBack={nav.back} />
+      <StepHeader label={L(`Тест · Вопрос ${idx + 1} из ${total}`, `Quiz · Question ${idx + 1} of ${total}`)} steps={total} current={revealed ? idx + 1 : idx} onBack={nav.back} />
 
       <div className="flex-1 px-5 pb-10 pt-6">
         <div className="eyebrow">{course.title}</div>
@@ -119,7 +120,7 @@ export function QuizScreen({ courseId }: { courseId: string }) {
 
       <BottomBar>
         <PrimaryButton disabled={selected === null} onClick={onMain}>
-          {!revealed ? 'Проверить' : isLast ? 'Завершить' : 'Следующий вопрос'}
+          {!revealed ? L('Проверить', 'Check') : isLast ? L('Завершить', 'Finish') : L('Следующий вопрос', 'Next question')}
         </PrimaryButton>
       </BottomBar>
     </div>

@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { L } from '../lib/i18n';
 import { motion } from 'motion/react';
 import confetti from 'canvas-confetti';
 import { Check, RotateCcw, Sparkles } from 'lucide-react';
@@ -23,9 +24,9 @@ export function QuizResultScreen({ courseId, correct, total, before }: { courseI
   }, [passed]);
 
   const stats = [
-    { v: `${correct}/${total}`, l: 'верных' },
-    { v: `${pct}%`, l: 'результат' },
-    { v: `+${gained}%`, l: 'к прогрессу' },
+    { v: `${correct}/${total}`, l: L('верных', 'correct') },
+    { v: `${pct}%`, l: L('результат', 'score') },
+    { v: `+${gained}%`, l: L('к прогрессу', 'progress') },
   ];
 
   return (
@@ -53,12 +54,12 @@ export function QuizResultScreen({ courseId, correct, total, before }: { courseI
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
-          <div className="eyebrow mt-7" style={{ letterSpacing: '0.12em' }}>{passed ? 'Раздел завершён' : 'Почти получилось'}</div>
-          <h1 className="font-display mt-2" style={{ fontSize: 34, lineHeight: 1.1 }}>{passed ? 'Отличная работа!' : 'Попробуйте ещё раз'}</h1>
+          <div className="eyebrow mt-7" style={{ letterSpacing: '0.12em' }}>{passed ? L('Раздел завершён', 'Course complete') : L('Почти получилось', 'Almost there')}</div>
+          <h1 className="font-display mt-2" style={{ fontSize: 34, lineHeight: 1.1 }}>{passed ? L('Отличная работа!', 'Great work!') : L('Попробуйте ещё раз', 'Try again')}</h1>
           <p className="mx-auto mt-3 max-w-[290px]" style={{ color: 'var(--muted-2)', lineHeight: 1.5 }}>
             {passed
-              ? 'Вы успешно прошли проверку знаний. Прогресс по курсу обновлён.'
-              : `Нужно ответить верно хотя бы на ${Math.ceil(total * PASS_THRESHOLD)} из ${total}. Перечитайте уроки и попробуйте снова.`}
+              ? L('Вы успешно прошли проверку знаний. Прогресс по курсу обновлён.', 'You passed the knowledge check. Your progress has been updated.')
+              : L(`Нужно ответить верно хотя бы на ${Math.ceil(total * PASS_THRESHOLD)} из ${total}. Перечитайте уроки и попробуйте снова.`, `You need at least ${Math.ceil(total * PASS_THRESHOLD)} of ${total} right. Review the lessons and try again.`)}
           </p>
         </motion.div>
 
@@ -79,7 +80,7 @@ export function QuizResultScreen({ courseId, correct, total, before }: { courseI
 
         <div className="mt-auto w-full space-y-3 pt-10">
           <PrimaryButton center onClick={() => (passed ? nav.toTab('home') : nav.back())}>
-            {passed ? 'Продолжить обучение' : 'К курсу'}
+            {passed ? L('Продолжить обучение', 'Keep learning') : L('К курсу', 'Back to course')}
           </PrimaryButton>
           {!passed && (
             <button
@@ -87,7 +88,7 @@ export function QuizResultScreen({ courseId, correct, total, before }: { courseI
               className="press flex w-full items-center justify-center gap-2 rounded-2xl border border-black/10 bg-white px-6 py-4"
               style={{ fontWeight: 500 }}
             >
-              <RotateCcw size={16} /> Пройти заново
+              <RotateCcw size={16} /> {L('Пройти заново', 'Retake')}
             </button>
           )}
         </div>

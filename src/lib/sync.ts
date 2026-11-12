@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react';
+import { L } from './i18n';
 import { actions, getState, subscribe, summary, type State, type Summary } from './store';
 import { initData, inTelegram } from './telegram';
 
@@ -94,21 +95,21 @@ export type Blocked = { id: number; name: string; username: string | null; at: s
 
 export async function fetchTeam(): Promise<{ team: Member[]; blocked: Blocked[]; bot: string | null }> {
   const r = await fetch('/api/team', { headers: headers() });
-  if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error ?? 'Ошибка сервера');
+  if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error ?? L('Ошибка сервера', 'Server error'));
   return r.json();
 }
 
 export async function removeMember(id: number) {
   const r = await fetch(`/api/member?id=${id}`, { method: 'DELETE', headers: headers() });
-  if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error ?? 'Не удалось удалить');
+  if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error ?? L('Не удалось удалить', 'Could not remove'));
 }
 
 export async function unblockMember(id: number) {
   const r = await fetch('/api/member', { method: 'POST', headers: headers(), body: JSON.stringify({ id, action: 'unblock' }) });
-  if (!r.ok) throw new Error('Не удалось вернуть доступ');
+  if (!r.ok) throw new Error(L('Не удалось вернуть доступ', 'Could not restore access'));
 }
 
 export async function saveRole(id: number, role: string) {
   const r = await fetch('/api/role', { method: 'PUT', headers: headers(), body: JSON.stringify({ id, role }) });
-  if (!r.ok) throw new Error('Не удалось сохранить');
+  if (!r.ok) throw new Error(L('Не удалось сохранить', 'Could not save'));
 }

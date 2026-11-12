@@ -5,6 +5,8 @@
  * (h, p, tip, warn, list). Тексты ниже — заготовки, замените на свои регламенты.
  */
 import type { Block } from './courses';
+import { en } from '../lib/i18n';
+import { knowledgeEn } from './demo-en';
 
 export type Doc = {
   id: string;
@@ -61,7 +63,7 @@ export const defaultKnowledge: Doc[] = [
 export const DOC_ICONS = ['book', 'shield', 'package', 'sparkles', 'wallet', 'scale'] as const;
 
 /** Актуальная база знаний (из базы данных, если сохранена). Меняется через setKnowledge. */
-export let knowledgeBase: Doc[] = defaultKnowledge;
+export let knowledgeBase: Doc[] = en ? knowledgeEn : defaultKnowledge;
 export function setKnowledge(next: Doc[]) {
   knowledgeBase = next;
 }

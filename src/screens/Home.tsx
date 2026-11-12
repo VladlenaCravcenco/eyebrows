@@ -1,6 +1,7 @@
 import { ArrowUpRight, Flame, Play, Trophy } from 'lucide-react';
+import { L, locale } from '../lib/i18n';
 import { motion } from 'motion/react';
-import { courseMinutes, courses } from '../content/courses';
+import { categoryLabel, courseMinutes, courses } from '../content/courses';
 import { useNav } from '../lib/nav';
 import {
   courseProgress,
@@ -16,14 +17,14 @@ import { ProgressBar, plural, stagger } from '../components/ui';
 
 function greeting() {
   const h = new Date().getHours();
-  if (h < 5) return 'Доброй ночи';
-  if (h < 12) return 'Доброе утро';
-  if (h < 18) return 'Добрый день';
-  return 'Добрый вечер';
+  if (h < 5) return L('Доброй ночи', 'Good night');
+  if (h < 12) return L('Доброе утро', 'Good morning');
+  if (h < 18) return L('Добрый день', 'Good afternoon');
+  return L('Добрый вечер', 'Good evening');
 }
 
 function today() {
-  const s = new Date().toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' });
+  const s = new Date().toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'long' });
   return s[0]!.toUpperCase() + s.slice(1);
 }
 
@@ -56,27 +57,27 @@ export function HomeScreen() {
       >
         <div className="absolute -right-10 -top-10 h-48 w-48 rounded-full" style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.08), transparent 70%)' }} />
         <div className="flex items-center gap-2" style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)' }}>
-          <Flame size={14} /> Ваш прогресс
+          <Flame size={14} /> {L('Ваш прогресс', 'Your progress')}
         </div>
         <div className="mt-3 flex items-end gap-3">
           <span className="font-display" style={{ fontSize: 56, lineHeight: 1 }}>{total}</span>
           <span style={{ fontSize: 18, color: 'rgba(255,255,255,0.6)', marginBottom: 8 }}>%</span>
         </div>
         <p className="mt-1" style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>
-          Пройдено {done} из {courses.length} {plural(courses.length, 'раздела', 'разделов', 'разделов')} курса мастера
+          {L(`Пройдено ${done} из ${courses.length} ${plural(courses.length, 'раздела', 'разделов', 'разделов')} курса мастера`, `${done} of ${courses.length} courses completed`)}
         </p>
         <div className="mt-5">
           <ProgressBar value={total} dark height={6} />
         </div>
         <div className="mt-5 flex items-center gap-4" style={{ fontSize: 12 }}>
           <div>
-            <div style={{ color: 'rgba(255,255,255,0.5)' }}>Дней подряд</div>
-            <div style={{ fontWeight: 500, marginTop: 2 }}>{days} {plural(days, 'день', 'дня', 'дней')}</div>
+            <div style={{ color: 'rgba(255,255,255,0.5)' }}>{L('Дней подряд', 'Day streak')}</div>
+            <div style={{ fontWeight: 500, marginTop: 2 }}>{days} {plural(days, 'день', 'дня', 'дней', 'day', 'days')}</div>
           </div>
           <div className="h-6 w-px bg-white/15" />
           <div>
-            <div style={{ color: 'rgba(255,255,255,0.5)' }}>Тестов сдано</div>
-            <div style={{ fontWeight: 500, marginTop: 2 }}>{testsPassed(s)} из {courses.filter((c) => c.quiz.length).length}</div>
+            <div style={{ color: 'rgba(255,255,255,0.5)' }}>{L('Тестов сдано', 'Quizzes passed')}</div>
+            <div style={{ fontWeight: 500, marginTop: 2 }}>{testsPassed(s)} {L('из', 'of')} {courses.filter((c) => c.quiz.length).length}</div>
           </div>
         </div>
       </motion.div>
@@ -84,17 +85,17 @@ export function HomeScreen() {
       {allDone ? (
         <motion.div {...stagger(2)} className="mt-7 rounded-3xl border border-black/5 p-6 text-center" style={{ background: 'var(--cream)' }}>
           <Trophy className="mx-auto" size={28} />
-          <h3 className="font-display mt-3" style={{ fontSize: 22 }}>Все курсы пройдены!</h3>
+          <h3 className="font-display mt-3" style={{ fontSize: 22 }}>{L('Все курсы пройдены!', 'All courses complete!')}</h3>
           <p className="mt-2" style={{ color: 'var(--muted-2)', fontSize: 14 }}>
-            Возвращайтесь в базу знаний, когда нужно что-то уточнить.
+            {L('Возвращайтесь в базу знаний, когда нужно что-то уточнить.', 'Come back to the knowledge base whenever you need a refresher.')}
           </p>
         </motion.div>
       ) : (
         <>
           <motion.div {...stagger(2)} className="mt-8 flex items-center justify-between">
-            <h3 style={{ fontWeight: 500, fontSize: 18 }}>{currentP > 0 ? 'Продолжить' : 'Начните отсюда'}</h3>
+            <h3 style={{ fontWeight: 500, fontSize: 18 }}>{currentP > 0 ? L('Продолжить', 'Continue') : L('Начните отсюда', 'Start here')}</h3>
             <button onClick={() => nav.toTab('courses')} className="flex items-center gap-1" style={{ fontSize: 13, color: 'var(--muted-2)' }}>
-              Все курсы <ArrowUpRight size={14} />
+              {L('Все курсы', 'All courses')} <ArrowUpRight size={14} />
             </button>
           </motion.div>
 
@@ -106,7 +107,7 @@ export function HomeScreen() {
           >
             <div className="h-32 w-full" style={{ background: current.cover }} />
             <div className="p-5">
-              <div className="eyebrow">{current.category}</div>
+              <div className="eyebrow">{categoryLabel(current.category)}</div>
               <div className="mt-1.5 flex items-center justify-between gap-3">
                 <h4 style={{ fontWeight: 500, fontSize: 18 }}>{current.title}</h4>
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-black text-white">
@@ -124,7 +125,7 @@ export function HomeScreen() {
 
       {recommended.length > 0 && (
         <>
-          <motion.h3 {...stagger(4)} className="mt-8" style={{ fontWeight: 500, fontSize: 18 }}>Дальше по программе</motion.h3>
+          <motion.h3 {...stagger(4)} className="mt-8" style={{ fontWeight: 500, fontSize: 18 }}>{L('Дальше по программе', 'Up next')}</motion.h3>
           <div className="mt-3 space-y-2.5">
             {recommended.map((c, i) => (
               <motion.button
@@ -135,7 +136,7 @@ export function HomeScreen() {
               >
                 <div className="h-14 w-14 shrink-0 rounded-xl" style={{ background: c.cover }} />
                 <div className="min-w-0 flex-1">
-                  <div style={{ fontSize: 11, color: 'var(--muted)' }}>{c.category} · {courseMinutes(c)} мин</div>
+                  <div style={{ fontSize: 11, color: 'var(--muted)' }}>{categoryLabel(c.category)} · {courseMinutes(c)} {L('мин', 'min')}</div>
                   <div className="truncate" style={{ fontWeight: 500, marginTop: 2 }}>{c.title}</div>
                 </div>
                 <ArrowUpRight size={16} className="shrink-0 text-black/40" />

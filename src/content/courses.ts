@@ -16,6 +16,8 @@
  * В тесте correct — номер правильного ответа, считая с нуля (0 = первый вариант).
  * id курсов и уроков менять нельзя после запуска — к ним привязан прогресс девочек.
  */
+import { L, en } from '../lib/i18n';
+import { coursesEn } from './demo-en';
 
 export type Block =
   | { kind: 'h' | 'p' | 'tip' | 'warn' | 'check'; text: string }
@@ -59,6 +61,10 @@ export const COVERS = [
   'linear-gradient(135deg, #E9E6F2 0%, #CFCAE0 100%)',
   'linear-gradient(135deg, #1A1A1F 0%, #2E2E36 100%)',
 ];
+/** Название раздела на языке интерфейса (в данных разделы хранятся по-русски) */
+export const categoryLabel = (c: string) =>
+  ({ Старт: L('Старт', 'Start'), Обязательно: L('Обязательно', 'Required'), Сервис: L('Сервис', 'Service'), Регламент: L('Регламент', 'Policy') })[c] ?? c;
+
 export const isDarkCover = (cover: string) => cover.includes('#1A1A1F');
 
 export const PASS_THRESHOLD = 0.6; // доля верных ответов, чтобы тест засчитался
@@ -222,7 +228,7 @@ export const defaultCourses: Course[] = [
 ];
 
 /** Актуальные курсы (из базы, если там что-то сохранено). Меняется через setCourses. */
-export let courses: Course[] = defaultCourses;
+export let courses: Course[] = en ? coursesEn : defaultCourses;
 export function setCourses(next: Course[]) {
   courses = next;
 }

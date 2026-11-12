@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { L } from '../lib/i18n';
 import { motion } from 'motion/react';
 import { Book, ChevronRight, Package, Scale, Search, Shield, Sparkles, Wallet, X } from 'lucide-react';
 import { knowledgeBase, type Doc } from '../content/knowledge';
@@ -21,8 +22,8 @@ export function KnowledgeScreen() {
   return (
     <div className="px-5 pb-36">
       <div className="pt-safe">
-        <h2 className="font-display pt-6" style={{ fontSize: 28 }}>База знаний</h2>
-        <p className="mt-1" style={{ color: 'var(--muted)', fontSize: 13 }}>Регламенты, инструкции и справочные материалы</p>
+        <h2 className="font-display pt-6" style={{ fontSize: 28 }}>{L('База знаний', 'Knowledge base')}</h2>
+        <p className="mt-1" style={{ color: 'var(--muted)', fontSize: 13 }}>{L('Регламенты, инструкции и справочные материалы', 'Policies, how-tos and reference docs')}</p>
       </div>
 
       <div className="mt-5 flex items-center gap-2 rounded-2xl border border-black/5 bg-white px-4 py-3 focus-within:border-black/20">
@@ -30,18 +31,18 @@ export function KnowledgeScreen() {
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Найти документ или раздел"
+          placeholder={L('Найти документ или раздел', 'Find a document or section')}
           className="w-full bg-transparent outline-none placeholder:text-black/35"
           style={{ fontSize: 14 }}
         />
         {q && (
-          <button onClick={() => setQ('')} aria-label="Очистить">
+          <button onClick={() => setQ('')} aria-label={L('Очистить', 'Clear')}>
             <X size={16} className="text-black/40" />
           </button>
         )}
       </div>
 
-      <div className="eyebrow mt-6">{query ? `Найдено: ${list.length}` : 'Категории'}</div>
+      <div className="eyebrow mt-6">{query ? L(`Найдено: ${list.length}`, `Found: ${list.length}`) : L('Категории', 'Categories')}</div>
       <div className="mt-3 space-y-2">
         {list.map((k, i) => {
           const Icon = docIcons[k.icon];
@@ -69,8 +70,8 @@ export function KnowledgeScreen() {
       </div>
 
       <div className="mt-6 rounded-3xl border border-black/5 p-5" style={{ background: 'linear-gradient(135deg, #F4EFE7, #FAF7F1)' }}>
-        <div className="eyebrow" style={{ color: 'var(--gold)' }}>Подсказка</div>
-        <p className="mt-2" style={{ lineHeight: 1.5 }}>Сверяйтесь с регламентом прямо во время работы — поиск ищет по всему тексту документов.</p>
+        <div className="eyebrow" style={{ color: 'var(--gold)' }}>{L('Подсказка', 'Tip')}</div>
+        <p className="mt-2" style={{ lineHeight: 1.5 }}>{L('Сверяйтесь с регламентом прямо во время работы — поиск ищет по всему тексту документов.', 'Check the rules right at work — search looks through every document.')}</p>
       </div>
     </div>
   );

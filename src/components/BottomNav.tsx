@@ -1,4 +1,5 @@
 import { BookOpen, Home, Library, PenLine, User, Users, LayoutDashboard } from 'lucide-react';
+import { L } from '../lib/i18n';
 import { motion } from 'motion/react';
 import { useNav, type Tab } from '../lib/nav';
 import { haptic } from '../lib/telegram';
@@ -6,16 +7,16 @@ import { haptic } from '../lib/telegram';
 type Item = { id: Tab; label: string; Icon: typeof Home };
 
 export const learnerTabs: Item[] = [
-  { id: 'home', label: 'Главная', Icon: Home },
-  { id: 'courses', label: 'Курсы', Icon: BookOpen },
-  { id: 'knowledge', label: 'База', Icon: Library },
-  { id: 'profile', label: 'Профиль', Icon: User },
+  { id: 'home', label: L('Главная', 'Home'), Icon: Home },
+  { id: 'courses', label: L('Курсы', 'Courses'), Icon: BookOpen },
+  { id: 'knowledge', label: L('База', 'Library'), Icon: Library },
+  { id: 'profile', label: L('Профиль', 'Profile'), Icon: User },
 ];
 
 export const adminTabs: Item[] = [
-  { id: 'team', label: 'Команда', Icon: LayoutDashboard },
-  { id: 'staff', label: 'Сотрудники', Icon: Users },
-  { id: 'texts', label: 'Тексты', Icon: PenLine },
+  { id: 'team', label: L('Команда', 'Team'), Icon: LayoutDashboard },
+  { id: 'staff', label: L('Сотрудники', 'Staff'), Icon: Users },
+  { id: 'texts', label: L('Тексты', 'Content'), Icon: PenLine },
 ];
 
 export function BottomNav({ active, items }: { active: Tab; items: Item[] }) {

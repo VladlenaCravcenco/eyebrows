@@ -1,0 +1,23 @@
+{
+  "name": "eyebrows-presentation",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "screens": "node scripts/capture.mjs",
+    "studio": "remotion studio src/index.ts",
+    "render": "remotion render src/index.ts Keynote out/mentor-keynote-16x9.mp4 --codec=h264 --crf=16 --browser-executable=\"$(ls -d ~/Library/Caches/ms-playwright/chromium_headless_shell-*/*/chrome-headless-shell | tail -1)\"",
+    "render:vertical": "remotion render src/index.ts KeynoteVertical out/mentor-keynote-9x16.mp4 --codec=h264 --crf=16 --browser-executable=\"$(ls -d ~/Library/Caches/ms-playwright/chromium_headless_shell-*/*/chrome-headless-shell | tail -1)\""
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.543",
+    "@remotion/google-fonts": "4.0.543",
+    "remotion": "4.0.543",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.23",
+    "playwright": "1.65.0",
+    "typescript": "5.8.3"
+  }
+}

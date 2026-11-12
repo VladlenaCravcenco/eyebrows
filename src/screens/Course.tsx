@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
+import { L } from '../lib/i18n';
 import { CheckCircle2, Clock, FileText, ListChecks, Lock, Trophy } from 'lucide-react';
-import { courseMinutes, findCourse, isDarkCover } from '../content/courses';
+import { categoryLabel, courseMinutes, findCourse, isDarkCover } from '../content/courses';
 import { useNav } from '../lib/nav';
 import { courseProgress, lessonsDoneCount, nextLessonIndex, useStore } from '../lib/store';
 import { BackButton, BottomBar, PrimaryButton, ProgressBar, plural, stagger } from '../components/ui';
@@ -23,9 +24,9 @@ export function CourseScreen({ courseId }: { courseId: string }) {
 
   const hasQuiz = course.quiz.length > 0;
   const cta = !allLessonsDone
-    ? { label: doneCount === 0 ? 'Начать курс' : `Продолжить · урок ${next + 1}`, go: () => openLesson(next) }
+    ? { label: doneCount === 0 ? L('Начать курс', 'Start course') : L(`Продолжить · урок ${next + 1}`, `Continue · lesson ${next + 1}`), go: () => openLesson(next) }
     : hasQuiz && !quiz?.passed
-      ? { label: 'Пройти тест', go: startQuiz }
+      ? { label: L('Пройти тест', 'Take the quiz'), go: startQuiz }
       : null;
 
   return (
@@ -37,7 +38,7 @@ export function CourseScreen({ courseId }: { courseId: string }) {
               <BackButton glass onClick={nav.back} />
             </div>
             <div className="absolute bottom-5 left-5 eyebrow" style={{ color: dark ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.5)' }}>
-              {course.category}
+              {categoryLabel(course.category)}
             </div>
           </div>
         </div>
@@ -48,26 +49,26 @@ export function CourseScreen({ courseId }: { courseId: string }) {
         <motion.p {...stagger(1)} className="mt-2" style={{ color: 'var(--muted-2)', lineHeight: 1.5 }}>{course.subtitle}</motion.p>
 
         <motion.div {...stagger(2)} className="mt-5 flex items-center gap-4" style={{ fontSize: 13, color: 'var(--muted-2)' }}>
-          <div className="flex items-center gap-1.5"><Clock size={14} /> {courseMinutes(course)} мин</div>
+          <div className="flex items-center gap-1.5"><Clock size={14} /> {courseMinutes(course)} {L('мин', 'min')}</div>
           <div className="h-3 w-px bg-black/10" />
-          <div>{course.lessons.length} {plural(course.lessons.length, 'урок', 'урока', 'уроков')}</div>
+          <div>{course.lessons.length} {plural(course.lessons.length, 'урок', 'урока', 'уроков', 'lesson', 'lessons')}</div>
           <div className="h-3 w-px bg-black/10" />
-          <div>+ тест</div>
+          <div>{L('+ тест', '+ quiz')}</div>
         </motion.div>
 
         <motion.div {...stagger(3)} className="mt-5 rounded-2xl border border-black/5 bg-white p-4">
           <div className="flex items-center justify-between" style={{ fontSize: 13 }}>
-            <span style={{ color: 'var(--muted-2)' }}>Ваш прогресс</span>
+            <span style={{ color: 'var(--muted-2)' }}>{L('Ваш прогресс', 'Your progress')}</span>
             <span style={{ fontWeight: 500 }}>{p}%</span>
           </div>
           <div className="mt-3"><ProgressBar value={p} height={6} /></div>
           <div className="mt-2" style={{ fontSize: 12, color: 'var(--muted)' }}>
-            Пройдено {doneCount} из {course.lessons.length}
-            {quiz && ` · тест ${quiz.correct}/${quiz.total}`}
+            {L(`Пройдено ${doneCount} из ${course.lessons.length}`, `${doneCount} of ${course.lessons.length} done`)}
+            {quiz && L(` · тест ${quiz.correct}/${quiz.total}`, ` · quiz ${quiz.correct}/${quiz.total}`)}
           </div>
         </motion.div>
 
-        <h3 className="mt-7" style={{ fontWeight: 500, fontSize: 18 }}>Программа</h3>
+        <h3 className="mt-7" style={{ fontWeight: 500, fontSize: 18 }}>{L('Программа', 'Program')}</h3>
         <div className="mt-3 space-y-2">
           {course.lessons.map((l, i) => {
             const Icon = l.type === 'checklist' ? ListChecks : FileText;
@@ -88,10 +89,10 @@ export function CourseScreen({ courseId }: { courseId: string }) {
                   {done ? <CheckCircle2 size={18} /> : locked ? <Lock size={16} className="text-black/40" /> : <Icon size={16} />}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div style={{ fontSize: 11, color: 'var(--muted)' }}>Урок {i + 1} · {l.minutes} мин</div>
+                  <div style={{ fontSize: 11, color: 'var(--muted)' }}>{L('Урок', 'Lesson')} {i + 1} · {l.minutes} {L('мин', 'min')}</div>
                   <div style={{ fontWeight: 500, marginTop: 2, lineHeight: 1.3 }}>{l.title}</div>
                 </div>
-                {current && <span className="shrink-0 rounded-full bg-black px-3 py-1 text-white" style={{ fontSize: 11 }}>Сейчас</span>}
+                {current && <span className="shrink-0 rounded-full bg-black px-3 py-1 text-white" style={{ fontSize: 11 }}>{L('Сейчас', 'Now')}</span>}
               </motion.button>
             );
           })}
@@ -109,13 +110,13 @@ export function CourseScreen({ courseId }: { courseId: string }) {
             </div>
             <div className="flex-1">
               <div style={{ fontSize: 11, color: 'var(--muted)' }}>
-                Финальный тест · {course.quiz.length} {plural(course.quiz.length, 'вопрос', 'вопроса', 'вопросов')}
+                {L('Финальный тест', 'Final quiz')} · {course.quiz.length} {plural(course.quiz.length, 'вопрос', 'вопроса', 'вопросов', 'question', 'questions')}
               </div>
               <div style={{ fontWeight: 500, marginTop: 2 }}>
-                {quiz?.passed ? `Сдан · ${quiz.correct}/${quiz.total}` : 'Проверка знаний'}
+                {quiz?.passed ? L(`Сдан · ${quiz.correct}/${quiz.total}`, `Passed · ${quiz.correct}/${quiz.total}`) : L('Проверка знаний', 'Knowledge check')}
               </div>
             </div>
-            {quiz?.passed && <span style={{ fontSize: 12, color: 'var(--muted-2)' }}>Пересдать</span>}
+            {quiz?.passed && <span style={{ fontSize: 12, color: 'var(--muted-2)' }}>{L('Пересдать', 'Retake')}</span>}
           </motion.button>}
         </div>
       </div>

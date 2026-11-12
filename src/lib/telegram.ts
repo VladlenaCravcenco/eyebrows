@@ -2,6 +2,7 @@
  * Тонкая обёртка над Telegram Mini App SDK.
  * Если приложение открыто в обычном браузере — все функции просто ничего не делают.
  */
+import { L } from './i18n';
 type TgUser = { id: number; first_name: string; last_name?: string; username?: string };
 
 type WebApp = {
@@ -86,5 +87,5 @@ export async function shareLink(url: string, text: string) {
     return;
   }
   await navigator.clipboard?.writeText(`${text} ${url}`);
-  await tell('Ссылка скопирована');
+  await tell(L('Ссылка скопирована', 'Link copied'));
 }

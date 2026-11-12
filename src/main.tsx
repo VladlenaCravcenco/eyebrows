@@ -6,6 +6,11 @@ import { initTelegram, telegramUser } from './lib/telegram';
 import { startSync } from './lib/sync';
 import { loadContent } from './content/live';
 import './styles.css';
+import { brand } from './content/brand';
+import { lang, L } from './lib/i18n';
+
+document.title = `${brand.name} — ${L('обучение мастеров', 'team training')}`;
+document.documentElement.lang = lang;
 
 initTelegram();
 

@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react';
+import { L } from './i18n';
 import { courses, findCourse, PASS_THRESHOLD, type Course } from '../content/courses';
 
 /**
@@ -208,13 +209,13 @@ export function achievements(s: State): Achievement[] {
   const sanitary = findCourse('sanitary');
   const mandatory = courses.filter((c) => c.category === 'Обязательно');
   return [
-    { id: 'first', title: 'Первый урок', hint: 'Пройти любой урок', tone: '#EFE7DC', got: lessonsTotalDone(s) > 0 },
-    { id: 'test', title: 'Первый тест', hint: 'Сдать любой тест', tone: '#E8EEE9', got: testsPassed(s) > 0 },
-    { id: 'perfect', title: 'Без ошибок', hint: 'Тест на 100%', tone: '#F1E4E4', got: perfect },
-    { id: 'steril', title: 'Стерильность 100%', hint: 'Санитарные нормы без ошибок', tone: '#E8EEE9', got: !!sanitary && s.quiz.sanitary?.correct === s.quiz.sanitary?.total && !!s.quiz.sanitary },
-    { id: 'streak3', title: '3 дня подряд', hint: 'Заниматься 3 дня подряд', tone: '#EFE7DC', got: streak(s) >= 3 },
-    { id: 'mandatory', title: 'Всё обязательное', hint: 'Пройти обязательные курсы', tone: '#E5E5EA', got: mandatory.every((c) => courseProgress(s, c) === 100) },
-    { id: 'all', title: 'Мастер студии', hint: 'Пройти все курсы', tone: '#1A1A1F', got: courses.every((c) => courseProgress(s, c) === 100) },
+    { id: 'first', title: L('Первый урок', 'First lesson'), hint: L('Пройти любой урок', 'Finish any lesson'), tone: '#EFE7DC', got: lessonsTotalDone(s) > 0 },
+    { id: 'test', title: L('Первый тест', 'First quiz'), hint: L('Сдать любой тест', 'Pass any quiz'), tone: '#E8EEE9', got: testsPassed(s) > 0 },
+    { id: 'perfect', title: L('Без ошибок', 'Flawless'), hint: L('Тест на 100%', 'Score 100% on a quiz'), tone: '#F1E4E4', got: perfect },
+    { id: 'steril', title: L('Стерильность 100%', 'Sterile 100%'), hint: L('Санитарные нормы без ошибок', 'Ace the hygiene quiz'), tone: '#E8EEE9', got: !!sanitary && s.quiz.sanitary?.correct === s.quiz.sanitary?.total && !!s.quiz.sanitary },
+    { id: 'streak3', title: L('3 дня подряд', '3-day streak'), hint: L('Заниматься 3 дня подряд', 'Learn 3 days in a row'), tone: '#EFE7DC', got: streak(s) >= 3 },
+    { id: 'mandatory', title: L('Всё обязательное', 'All required'), hint: L('Пройти обязательные курсы', 'Finish required courses'), tone: '#E5E5EA', got: mandatory.every((c) => courseProgress(s, c) === 100) },
+    { id: 'all', title: L('Мастер студии', 'Studio master'), hint: L('Пройти все курсы', 'Finish every course'), tone: '#1A1A1F', got: courses.every((c) => courseProgress(s, c) === 100) },
   ];
 }
 

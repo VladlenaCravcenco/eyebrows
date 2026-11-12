@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { L, locale } from '../../lib/i18n';
 import { AnimatePresence, motion } from 'motion/react';
 import { ChevronDown, ChevronUp, Plus, Trash2 } from 'lucide-react';
 import type { Block } from '../../content/courses';
@@ -128,8 +129,8 @@ export function RowTools({ onUp, onDown, onDelete, confirmText, stacked }: {
   const btn = 'flex h-8 w-8 items-center justify-center rounded-full bg-black/5 disabled:opacity-25';
   const arrows = (onUp || onDown) && (
     <div className={`flex gap-1 ${stacked ? 'flex-col' : ''}`}>
-      <button type="button" className={stacked ? btn.replace('h-8', 'h-7') : btn} disabled={!onUp} onClick={onUp} aria-label="Выше"><ChevronUp size={15} /></button>
-      <button type="button" className={stacked ? btn.replace('h-8', 'h-7') : btn} disabled={!onDown} onClick={onDown} aria-label="Ниже"><ChevronDown size={15} /></button>
+      <button type="button" className={stacked ? btn.replace('h-8', 'h-7') : btn} disabled={!onUp} onClick={onUp} aria-label={L('Выше', 'Up')}><ChevronUp size={15} /></button>
+      <button type="button" className={stacked ? btn.replace('h-8', 'h-7') : btn} disabled={!onDown} onClick={onDown} aria-label={L('Ниже', 'Down')}><ChevronDown size={15} /></button>
     </div>
   );
   return (
@@ -139,7 +140,7 @@ export function RowTools({ onUp, onDown, onDelete, confirmText, stacked }: {
         <button
           type="button"
           className={btn}
-          aria-label="Удалить"
+          aria-label={L('Удалить', 'Delete')}
           onClick={async () => {
             if (!confirmText || (await ask(confirmText))) onDelete();
           }}
@@ -167,12 +168,12 @@ export function AddButton({ children, onClick }: { children: ReactNode; onClick:
 /* ---------- Блоки текста (урок, раздел базы знаний) ---------- */
 
 export const BLOCK_LABELS: Record<Block['kind'], string> = {
-  h: 'Подзаголовок',
-  p: 'Текст',
-  tip: '✨ Важно',
-  warn: '⚠️ Нельзя',
-  list: 'Список',
-  check: '☑️ Пункт чек-листа',
+  h: L('Подзаголовок', 'Heading'),
+  p: L('Текст', 'Text'),
+  tip: L('✨ Важно', '✨ Important'),
+  warn: L('⚠️ Нельзя', '⚠️ Never'),
+  list: L('Список', 'List'),
+  check: L('☑️ Пункт чек-листа', '☑️ Checklist item'),
 };
 const KINDS = Object.keys(BLOCK_LABELS) as Block['kind'][];
 
@@ -206,17 +207,17 @@ export function BlocksEditor({ blocks, onChange }: { blocks: Block[]; onChange: 
               onUp={i > 0 ? () => swap(i, -1) : undefined}
               onDown={i < blocks.length - 1 ? () => swap(i, 1) : undefined}
               onDelete={() => onChange(blocks.filter((_, j) => j !== i))}
-              confirmText={(b.kind === 'list' ? b.items.join('') : b.text).trim() ? 'Удалить этот блок?' : undefined}
+              confirmText={(b.kind === 'list' ? b.items.join('') : b.text).trim() ? L('Удалить этот блок?', 'Delete this block?') : undefined}
             />
           </div>
           {b.kind === 'list' ? (
-            <Field multiline value={b.items.join('\n')} onChange={(v) => set(i, { kind: 'list', items: v.split('\n') })} placeholder="Каждый пункт — с новой строки" />
+            <Field multiline value={b.items.join('\n')} onChange={(v) => set(i, { kind: 'list', items: v.split('\n') })} placeholder={L('Каждый пункт — с новой строки', 'One item per line')} />
           ) : (
             <Field
               multiline={b.kind !== 'h'}
               value={b.text}
               onChange={(v) => set(i, { kind: b.kind, text: v })}
-              placeholder={b.kind === 'h' ? 'Подзаголовок' : b.kind === 'check' ? 'Что нужно сделать' : 'Текст'}
+              placeholder={b.kind === 'h' ? L('Подзаголовок', 'Heading') : b.kind === 'check' ? L('Что нужно сделать', 'What to do') : L('Текст', 'Text')}
             />
           )}
         </div>
@@ -240,7 +241,7 @@ export function BlocksEditor({ blocks, onChange }: { blocks: Block[]; onChange: 
           ))}
         </div>
       ) : (
-        <AddButton onClick={() => setAdding(true)}>Добавить блок</AddButton>
+        <AddButton onClick={() => setAdding(true)}>{L('Добавить блок', 'Add block')}</AddButton>
       )}
     </div>
   );
@@ -261,18 +262,18 @@ export function PublishBar() {
           className="pb-safe sticky bottom-0 z-30 border-t border-black/5 bg-white/90 px-5 pt-3 backdrop-blur-xl"
         >
           <p className="mb-2 text-center" style={{ fontSize: 12, color: 'var(--muted-2)' }}>
-            Есть несохранённые изменения — девочки их пока не видят
+            {L('Есть несохранённые изменения — девочки их пока не видят', 'Unsaved changes — your team doesn’t see them yet')}
           </p>
           <div className="flex gap-2">
             <button
               disabled={busy}
               onClick={async () => {
-                if (await ask('Отменить все несохранённые изменения?')) discard();
+                if (await ask(L('Отменить все несохранённые изменения?', 'Discard all unsaved changes?'))) discard();
               }}
               className="rounded-2xl border border-black/10 bg-white px-4 py-3.5"
               style={{ fontSize: 14, fontWeight: 500 }}
             >
-              Отменить
+              {L('Отменить', 'Discard')}
             </button>
             <button
               disabled={busy}
@@ -280,7 +281,7 @@ export function PublishBar() {
                 setBusy(true);
                 try {
                   await publish();
-                  await tell(inTelegram ? 'Сохранено! Девочки увидят изменения при следующем открытии.' : 'Сохранено (демо: только на этом устройстве).');
+                  await tell(inTelegram ? L('Сохранено! Девочки увидят изменения при следующем открытии.', 'Saved! Your team will see the changes next time they open the app.') : L('Сохранено (демо: только на этом устройстве).', 'Saved (demo: this device only).'));
                 } catch (e) {
                   await tell((e as Error).message);
                 } finally {
@@ -290,7 +291,7 @@ export function PublishBar() {
               className="flex-1 rounded-2xl bg-black px-4 py-3.5 text-white disabled:opacity-50"
               style={{ fontSize: 14, fontWeight: 500 }}
             >
-              {busy ? 'Сохраняем…' : 'Сохранить для всех'}
+              {busy ? L('Сохраняем…', 'Saving…') : L('Сохранить для всех', 'Publish for everyone')}
             </button>
           </div>
         </motion.div>
@@ -302,10 +303,10 @@ export function PublishBar() {
 export function LastSaved() {
   const m = contentMeta();
   if (!m.updatedAt) return null;
-  const when = new Date(m.updatedAt).toLocaleString('ru-RU', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
+  const when = new Date(m.updatedAt).toLocaleString(locale, { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
   return (
     <p className="text-center" style={{ fontSize: 12, color: 'var(--muted)' }}>
-      Последнее сохранение: {when}{m.updatedBy ? ` · ${m.updatedBy}` : ''}
+      {L('Последнее сохранение', 'Last saved')}: {when}{m.updatedBy ? ` · ${m.updatedBy}` : ''}
     </p>
   );
 }

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { L } from '../lib/i18n';
 import { AnimatePresence, motion } from 'motion/react';
 import { Check } from 'lucide-react';
 import { findCourse } from '../content/courses';
@@ -36,7 +37,7 @@ export function LessonScreen({ courseId, lessonId }: { courseId: string; lessonI
     <div className="flex min-h-dvh flex-col">
       <Watermark />
       <StepHeader
-        label={`${course.title} · Урок ${index + 1} из ${course.lessons.length}`}
+        label={`${course.title} · ${L(`Урок ${index + 1} из ${course.lessons.length}`, `Lesson ${index + 1} of ${course.lessons.length}`)}`}
         steps={course.lessons.length}
         current={index}
         onBack={nav.back}
@@ -44,7 +45,7 @@ export function LessonScreen({ courseId, lessonId }: { courseId: string; lessonI
 
       <div className="flex-1 px-5 pb-10 pt-6">
         <motion.div {...stagger(0)} className="eyebrow">
-          {lesson.minutes} мин · {lesson.type === 'checklist' ? 'чек-лист' : 'чтение'}
+          {lesson.minutes} {L('мин', 'min')} · {lesson.type === 'checklist' ? L('чек-лист', 'checklist') : L('чтение', 'reading')}
         </motion.div>
         <motion.h1 {...stagger(1)} className="font-display mt-2" style={{ fontSize: 30, lineHeight: 1.15 }}>
           {lesson.title}
@@ -100,12 +101,12 @@ export function LessonScreen({ courseId, lessonId }: { courseId: string; lessonI
               className="pb-3 text-center"
               style={{ fontSize: 12, color: 'var(--muted)' }}
             >
-              Отметьте все пункты чек-листа
+              {L('Отметьте все пункты чек-листа', 'Tick every item to continue')}
             </motion.p>
           )}
         </AnimatePresence>
         <PrimaryButton disabled={!allChecked} onClick={finish}>
-          {!isLast ? 'Следующий урок' : quizPassed ? 'Завершить' : 'Перейти к тесту'}
+          {!isLast ? L('Следующий урок', 'Next lesson') : quizPassed ? L('Завершить', 'Finish') : L('Перейти к тесту', 'Go to quiz')}
         </PrimaryButton>
       </BottomBar>
     </div>

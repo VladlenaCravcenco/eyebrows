@@ -1,7 +1,8 @@
 import { useState } from 'react';
+import { L } from '../lib/i18n';
 import { motion } from 'motion/react';
 import { CheckCircle2, Search, X } from 'lucide-react';
-import { CATEGORIES, courses } from '../content/courses';
+import { CATEGORIES, categoryLabel, courses } from '../content/courses';
 import { useNav } from '../lib/nav';
 import { courseProgress, useStore } from '../lib/store';
 import { ProgressBar, plural, stagger } from '../components/ui';
@@ -28,8 +29,8 @@ export function CoursesScreen() {
   return (
     <div className="px-5 pb-36">
       <div className="pt-safe">
-        <h2 className="font-display pt-6" style={{ fontSize: 28 }}>Курсы</h2>
-        <p className="mt-1" style={{ color: 'var(--muted)', fontSize: 13 }}>Микрообучение по разделам внутреннего регламента</p>
+        <h2 className="font-display pt-6" style={{ fontSize: 28 }}>{L('Курсы', 'Courses')}</h2>
+        <p className="mt-1" style={{ color: 'var(--muted)', fontSize: 13 }}>{L('Микрообучение по разделам внутреннего регламента', 'Bite-sized lessons on how your studio works')}</p>
       </div>
 
       <div className="mt-5 flex items-center gap-2 rounded-2xl border border-black/5 bg-white px-4 py-3 focus-within:border-black/20">
@@ -37,12 +38,12 @@ export function CoursesScreen() {
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Поиск курса или урока"
+          placeholder={L('Поиск курса или урока', 'Search courses and lessons')}
           className="w-full bg-transparent outline-none placeholder:text-black/35"
           style={{ fontSize: 14 }}
         />
         {q && (
-          <button onClick={() => setQ('')} aria-label="Очистить">
+          <button onClick={() => setQ('')} aria-label={L('Очистить', 'Clear')}>
             <X size={16} className="text-black/40" />
           </button>
         )}
@@ -58,7 +59,7 @@ export function CoursesScreen() {
             }`}
             style={{ fontSize: 13 }}
           >
-            {f}
+            {f === 'Все' ? L('Все', 'All') : categoryLabel(f)}
           </button>
         ))}
       </div>
@@ -83,13 +84,13 @@ export function CoursesScreen() {
                 </div>
                 <div className="flex flex-1 flex-col justify-between gap-4 p-4">
                   <div>
-                    <div className="eyebrow">{c.category}</div>
+                    <div className="eyebrow">{categoryLabel(c.category)}</div>
                     <div className="mt-1" style={{ fontWeight: 500, lineHeight: 1.3 }}>{c.title}</div>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="flex-1"><ProgressBar value={p} /></div>
                     <span className="shrink-0" style={{ fontSize: 11, color: 'var(--muted)' }}>
-                      {p > 0 ? `${p}%` : `${c.lessons.length} ${plural(c.lessons.length, 'урок', 'урока', 'уроков')}`}
+                      {p > 0 ? `${p}%` : `${c.lessons.length} ${plural(c.lessons.length, 'урок', 'урока', 'уроков', 'lesson', 'lessons')}`}
                     </span>
                   </div>
                 </div>
@@ -98,7 +99,7 @@ export function CoursesScreen() {
           );
         })}
         {list.length === 0 && (
-          <p className="py-10 text-center" style={{ color: 'var(--muted)', fontSize: 14 }}>Ничего не нашлось</p>
+          <p className="py-10 text-center" style={{ color: 'var(--muted)', fontSize: 14 }}>{L('Ничего не нашлось', 'Nothing found')}</p>
         )}
       </div>
     </div>

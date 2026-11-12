@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react';
+import { L } from '../../lib/i18n';
 import { courses, type Block, type Course, type Lesson, type Question } from '../../content/courses';
 import { knowledgeBase, type Doc } from '../../content/knowledge';
 import { publishContent, type Content } from '../../content/live';
@@ -73,7 +74,7 @@ export async function publish() {
     course.quiz = course.quiz.filter((q) => q.question.trim());
     for (const q of course.quiz) {
       q.options = q.options.map((o) => o.trim());
-      if (q.options.some((o) => !o)) throw new Error(`В вопросе «${q.question}» есть пустой вариант ответа`);
+      if (q.options.some((o) => !o)) throw new Error(L(`В вопросе «${q.question}» есть пустой вариант ответа`, `Question “${q.question}” has an empty answer option`));
     }
   }
   for (const d of c.knowledgeBase) for (const s of d.sections) s.content = tidy(s.content);
@@ -96,7 +97,7 @@ export function move<T>(list: T[], i: number, dir: -1 | 1) {
 
 export const blankCourse = (): Course => ({
   id: newId('c'),
-  title: 'Новый курс',
+  title: L('Новый курс', 'New course'),
   subtitle: '',
   category: 'Регламент',
   cover: 'linear-gradient(135deg, #EFE7DC 0%, #D9CFC2 100%)',
@@ -106,7 +107,7 @@ export const blankCourse = (): Course => ({
 
 export const blankLesson = (): Lesson => ({
   id: newId('l'),
-  title: 'Новый урок',
+  title: L('Новый урок', 'New lesson'),
   minutes: 3,
   type: 'reading',
   content: [{ kind: 'p', text: '' }],
@@ -116,11 +117,11 @@ export const blankQuestion = (): Question => ({ question: '', options: ['', ''],
 
 export const blankDoc = (): Doc => ({
   id: newId('d'),
-  title: 'Новый документ',
+  title: L('Новый документ', 'New document'),
   desc: '',
   icon: 'book',
-  tag: 'Регламент',
-  sections: [{ title: 'Раздел', content: [{ kind: 'p', text: '' }] }],
+  tag: L('Регламент', 'Policy'),
+  sections: [{ title: L('Раздел', 'Section'), content: [{ kind: 'p', text: '' }] }],
 });
 
 export const blankBlock = (kind: Block['kind']): Block => (kind === 'list' ? { kind, items: [''] } : { kind, text: '' });

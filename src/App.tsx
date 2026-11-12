@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from 'motion/react';
+import { L } from './lib/i18n';
 import { useEffect } from 'react';
 import { Lock, Sparkles } from 'lucide-react';
 import { adminTabs, BottomNav, learnerTabs } from './components/BottomNav';
@@ -100,9 +101,9 @@ function Blocked() {
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center px-8 text-center">
       <div className="flex h-16 w-16 items-center justify-center rounded-full bg-black/5"><Lock size={24} /></div>
-      <h1 className="font-display mt-6" style={{ fontSize: 26 }}>Доступ закрыт</h1>
+      <h1 className="font-display mt-6" style={{ fontSize: 26 }}>{L('Доступ закрыт', 'Access closed')}</h1>
       <p className="mt-3" style={{ color: 'var(--muted-2)', lineHeight: 1.5 }}>
-        Если это ошибка — напишите администратору студии.
+        {L('Если это ошибка — напишите администратору студии.', 'If this is a mistake, contact your studio manager.')}
       </p>
     </div>
   );
