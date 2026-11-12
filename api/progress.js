@@ -1,10 +1,11 @@
 // PUT /api/progress — сохранить прогресс { state, summary }
-import { upsertUser } from './_lib/db.js';
-import { auth, json, unauthorized } from './_lib/telegram.js';
+import { isBlocked, upsertUser } from './_lib/db.js';
+import { auth, blockedResponse, json, unauthorized } from './_lib/telegram.js';
 
 export async function PUT(request) {
   const me = auth(request);
   if (!me) return unauthorized();
+  if (!me.isManager && (await isBlocked(me.id))) return blockedResponse();
   const text = await request.text();
   if (text.length > 256 * 1024) return json({ error: 'too large' }, 413);
   const { state, summary } = JSON.parse(text || '{}');

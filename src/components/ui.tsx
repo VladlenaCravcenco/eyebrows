@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import type { ReactNode } from 'react';
 import type { Block } from '../content/courses';
 import { haptic } from '../lib/telegram';
+import { useStore } from '../lib/store';
 
 export function PrimaryButton({
   children,
@@ -174,4 +175,23 @@ export function plural(n: number, one: string, few: string, many: string) {
   if (m10 === 1 && m100 !== 11) return one;
   if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return few;
   return many;
+}
+
+/**
+ * Едва заметный водяной знак с именем сотрудницы поверх уроков.
+ * Скриншот он не запретит (это невозможно в Telegram), но по утёкшему снимку видно, чей он.
+ */
+export function Watermark() {
+  const s = useStore();
+  if (!s.user || s.isManager || s.demoAdmin) return null;
+  const label = [s.user.name, s.user.telegramId ? `ID ${s.user.telegramId}` : s.user.phone].filter(Boolean).join(' · ');
+  const esc = label.replace(/[<>&"']/g, '');
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="260" height="170"><text x="0" y="110" transform="rotate(-28 130 85)" font-family="Inter, sans-serif" font-size="13" fill="rgba(0,0,0,0.07)">${esc}</text></svg>`;
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none fixed inset-0 z-40 mx-auto max-w-[480px]"
+      style={{ backgroundImage: `url("data:image/svg+xml,${encodeURIComponent(svg)}")`, backgroundRepeat: 'repeat' }}
+    />
+  );
 }

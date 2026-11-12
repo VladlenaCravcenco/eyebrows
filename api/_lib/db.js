@@ -92,3 +92,32 @@ export async function saveContent(content) {
   if (prev) cmds.push(['SET', 'content:prev', prev]);
   await redis(...cmds);
 }
+
+/* ---------- Удалённые из бота (доступ закрыт) ---------- */
+
+export async function isBlocked(id) {
+  const [r] = await redis(['SISMEMBER', 'blocked', String(id)]);
+  return r === 1;
+}
+
+/** Удалить сотрудницу: стираем её данные и закрываем вход */
+export async function blockUser(id) {
+  const u = await getUser(id);
+  await redis(
+    ['DEL', key(id)],
+    ['SREM', 'users', String(id)],
+    ['SADD', 'blocked', String(id)],
+    ['SET', `blocked:${id}`, JSON.stringify({ id, name: u?.name ?? `ID ${id}`, username: u?.username ?? null, at: now() })],
+  );
+}
+
+export async function unblockUser(id) {
+  await redis(['SREM', 'blocked', String(id)], ['DEL', `blocked:${id}`]);
+}
+
+export async function blockedUsers() {
+  const [ids] = await redis(['SMEMBERS', 'blocked']);
+  if (!ids?.length) return [];
+  const [raws] = await redis(['MGET', ...ids.map((i) => `blocked:${i}`)]);
+  return raws.filter(Boolean).map((r) => JSON.parse(r));
+}

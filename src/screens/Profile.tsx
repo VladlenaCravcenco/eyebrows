@@ -1,14 +1,12 @@
 import { motion } from 'motion/react';
 import { Award, ChevronRight, LogOut, Phone, UserCog } from 'lucide-react';
 import { courses } from '../content/courses';
-import { useNav } from '../lib/nav';
 import { achievements, actions, coursesCompleted, initials, overallProgress, testsPassed, useStore } from '../lib/store';
 import { inTelegram } from '../lib/telegram';
 import { Avatar, plural, stagger } from '../components/ui';
 
 export function ProfileScreen() {
   const s = useStore();
-  const nav = useNav();
   const name = s.user?.name ?? '';
   const since = new Date(s.joinedAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
   const list = achievements(s);
@@ -80,12 +78,12 @@ export function ProfileScreen() {
             <span style={{ fontSize: 13, color: 'var(--muted)' }}>{s.user.phone}</span>
           </div>
         )}
-        {(s.isManager || !inTelegram) && (
-        <button onClick={() => nav.push({ name: 'manager' })} className="flex w-full items-center gap-4 px-4 py-4 text-left">
+        {!inTelegram && (
+        <button onClick={() => actions.setDemoAdmin(true)} className="flex w-full items-center gap-4 px-4 py-4 text-left">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-black text-white"><UserCog size={16} /></div>
           <div className="flex-1">
-            <div style={{ fontWeight: 500 }}>Режим руководителя</div>
-            <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>Прогресс команды</div>
+            <div style={{ fontWeight: 500 }}>Кабинет руководителя</div>
+            <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>Демо — в Telegram открывается сам у руководителя</div>
           </div>
           <ChevronRight size={16} className="text-black/30" />
         </button>

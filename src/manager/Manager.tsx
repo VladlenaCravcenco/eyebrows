@@ -1,14 +1,14 @@
 import { useState, type ReactNode } from 'react';
 import { motion } from 'motion/react';
-import { ArrowUpRight, CheckCircle2, Circle, Clock, Pencil, Search, TrendingUp, Users } from 'lucide-react';
+import { CheckCircle2, Circle, Clock, Pencil, Search, Send, TrendingUp, UserMinus, UserPlus, Users } from 'lucide-react';
 import { brand } from '../content/brand';
 import { courses } from '../content/courses';
 import { useNav } from '../lib/nav';
-import { initials } from '../lib/store';
-import { saveRole } from '../lib/sync';
+import { actions, initials } from '../lib/store';
+import { removeMember, saveRole, unblockMember } from '../lib/sync';
+import { ask, inTelegram, shareLink, tell } from '../lib/telegram';
 import { Avatar, BackButton, PrimaryButton, ProgressBar, plural, stagger } from '../components/ui';
 import { empProgress, empStatus, useTeam, type Employee } from './team';
-
 
 function ago(iso?: string) {
   if (!iso) return '';
@@ -20,22 +20,24 @@ function ago(iso?: string) {
 
 const fmtMinutes = (m: number) => (m < 60 ? `${m} мин` : `${Math.round(m / 6) / 10} ч`);
 
-/** Обёртка: загрузка / ошибка / пусто */
-function TeamState({ team, error, children }: { team: Employee[] | null; error: string | null; children: (t: Employee[]) => ReactNode }) {
-  if (error && !team)
-    return <p className="mt-10 text-center" style={{ color: '#9a4848', fontSize: 14 }}>{error}</p>;
-  if (!team) return <p className="mt-10 text-center" style={{ color: 'var(--muted)', fontSize: 14 }}>Загружаем команду…</p>;
-  if (team.length === 0)
-    return (
-      <div className="mt-6 rounded-3xl border border-black/5 p-6 text-center" style={{ background: 'var(--cream)' }}>
-        <Users className="mx-auto" size={24} />
-        <p className="mt-3" style={{ fontWeight: 500 }}>Пока никого нет</p>
-        <p className="mt-1" style={{ fontSize: 13, color: 'var(--muted-2)', lineHeight: 1.5 }}>
-          Отправьте девочкам ссылку на бота — как только они нажмут «Старт», появятся здесь.
-        </p>
+/** Заголовок вкладки кабинета */
+function AdminHeader({ title }: { title: string }) {
+  const { live } = useTeam();
+  return (
+    <div className="pt-safe">
+      <div className="flex items-start justify-between gap-3 pt-6">
+        <div>
+          <p style={{ fontSize: 12, color: 'var(--muted)' }}>Кабинет руководителя · {brand.name}</p>
+          <h2 className="font-display" style={{ fontSize: 28, marginTop: 2 }}>{title}</h2>
+        </div>
+        {!live && !inTelegram && (
+          <button onClick={() => actions.setDemoAdmin(false)} className="shrink-0 whitespace-nowrap rounded-full border border-black/10 bg-white px-3 py-2" style={{ fontSize: 12 }}>
+            Выйти из демо
+          </button>
+        )}
       </div>
-    );
-  return <>{children(team)}</>;
+    </div>
+  );
 }
 
 function DemoNote() {
@@ -48,6 +50,45 @@ function DemoNote() {
         Это пример. Настоящая команда видна, когда руководитель открывает приложение через Telegram-бота.
       </p>
     </div>
+  );
+}
+
+/** Карточка «пригласить сотрудницу» — отправляет ссылку на бота */
+function InviteCard({ compact }: { compact?: boolean }) {
+  const { bot } = useTeam();
+  const url = bot ? `https://t.me/${bot}` : null;
+  return (
+    <div className="rounded-3xl border border-black/5 p-5" style={{ background: 'var(--cream)' }}>
+      <div className="flex items-start gap-3">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white"><UserPlus size={18} /></div>
+        <div className="min-w-0">
+          <div style={{ fontWeight: 500 }}>Пригласить сотрудницу</div>
+          {!compact && (
+            <p className="mt-1" style={{ fontSize: 13, color: 'var(--muted-2)', lineHeight: 1.5 }}>
+              Отправьте ей ссылку на бота. Как только она нажмёт «Старт», появится в списке.
+            </p>
+          )}
+          {url && <div className="mt-1 truncate" style={{ fontSize: 13, color: 'var(--muted)' }}>{url.replace('https://', '')}</div>}
+        </div>
+      </div>
+      {url && (
+        <button
+          onClick={() => shareLink(url, 'Привет! Это обучение для мастеров нашей студии — нажми «Старт» 👇')}
+          className="press mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-black px-4 py-3.5 text-white"
+          style={{ fontWeight: 500, fontSize: 14 }}
+        >
+          <Send size={15} /> Отправить ссылку
+        </button>
+      )}
+    </div>
+  );
+}
+
+function Loading({ error }: { error: string | null }) {
+  return (
+    <p className="mt-10 text-center" style={{ color: error ? '#9a4848' : 'var(--muted)', fontSize: 14 }}>
+      {error ?? 'Загружаем команду…'}
+    </p>
   );
 }
 
@@ -78,7 +119,9 @@ function EmployeeRow({ e, i }: { e: Employee; i: number }) {
   );
 }
 
-export function ManagerScreen() {
+/* ---------- Вкладка «Команда» ---------- */
+
+export function TeamTab() {
   const nav = useNav();
   const { team, error } = useTeam();
   const list = team ?? [];
@@ -86,20 +129,9 @@ export function ManagerScreen() {
   const attention = list.filter((e) => empProgress(e) < 50);
 
   return (
-    <div className="min-h-dvh px-5 pb-16">
-      <div className="pt-safe">
-        <div className="flex items-start justify-between gap-3 pt-6">
-          <div>
-            <p style={{ fontSize: 12, color: 'var(--muted)' }}>Студия {brand.name}</p>
-            <h2 className="font-display" style={{ fontSize: 28, marginTop: 2 }}>Команда</h2>
-          </div>
-          <button onClick={nav.back} className="press flex h-11 items-center gap-2 rounded-full border border-black/10 bg-white px-4" style={{ fontSize: 13 }}>
-            Режим мастера <ArrowUpRight size={14} />
-          </button>
-        </div>
-      </div>
+    <div className="min-h-dvh px-5 pb-36">
+      <AdminHeader title="Команда" />
 
-      <TeamState team={team} error={error}>{() => (<>
       <motion.div {...stagger(0)} className="mt-5 rounded-3xl p-6 text-white" style={{ background: 'linear-gradient(135deg, #1A1A1F 0%, #2E2E36 100%)' }}>
         <div className="flex items-center gap-2" style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)' }}>
           <TrendingUp size={14} /> Средний прогресс команды
@@ -124,66 +156,110 @@ export function ManagerScreen() {
       </motion.div>
 
       <div className="mt-5 grid grid-cols-2 gap-3">
-        <motion.button {...stagger(1)} onClick={() => nav.push({ name: 'employees' })} className="press flex flex-col items-start gap-3 rounded-2xl border border-black/5 bg-white p-4 text-left">
+        <motion.button {...stagger(1)} onClick={() => nav.toTab('staff')} className="press flex flex-col items-start gap-3 rounded-2xl border border-black/5 bg-white p-4 text-left">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-black/5"><Users size={18} /></div>
           <div>
             <div style={{ fontWeight: 500 }}>Сотрудники</div>
             <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>{list.length} {plural(list.length, 'человек', 'человека', 'человек')}</div>
           </div>
         </motion.button>
-        <motion.button {...stagger(2)} onClick={() => nav.push({ name: 'content' })} className="press flex flex-col items-start gap-3 rounded-2xl border border-black/5 bg-white p-4 text-left">
+        <motion.button {...stagger(2)} onClick={() => nav.toTab('texts')} className="press flex flex-col items-start gap-3 rounded-2xl border border-black/5 bg-white p-4 text-left">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-black text-white"><Pencil size={17} /></div>
           <div>
-            <div style={{ fontWeight: 500 }}>Курсы и тексты</div>
-            <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>{courses.length} {plural(courses.length, 'курс', 'курса', 'курсов')} · редактировать</div>
+            <div style={{ fontWeight: 500 }}>Тексты</div>
+            <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>{courses.length} {plural(courses.length, 'курс', 'курса', 'курсов')} · редактор</div>
           </div>
         </motion.button>
       </div>
 
-      {attention.length > 0 && (
-        <>
-          <div className="mt-7 flex items-center justify-between">
-            <h3 style={{ fontWeight: 500, fontSize: 18 }}>Требуют внимания</h3>
-            <button onClick={() => nav.push({ name: 'employees' })} style={{ fontSize: 13, color: 'var(--muted-2)' }}>Все</button>
-          </div>
-          <div className="mt-3 space-y-2">
-            {attention.map((e, i) => <EmployeeRow key={e.id} e={e} i={3 + i} />)}
-          </div>
-        </>
+      {!team ? (
+        <Loading error={error} />
+      ) : list.length === 0 ? (
+        <motion.div {...stagger(3)} className="mt-5"><InviteCard /></motion.div>
+      ) : (
+        attention.length > 0 && (
+          <>
+            <div className="mt-7 flex items-center justify-between">
+              <h3 style={{ fontWeight: 500, fontSize: 18 }}>Требуют внимания</h3>
+              <button onClick={() => nav.toTab('staff')} style={{ fontSize: 13, color: 'var(--muted-2)' }}>Все</button>
+            </div>
+            <div className="mt-3 space-y-2">
+              {attention.map((e, i) => <EmployeeRow key={e.id} e={e} i={3 + i} />)}
+            </div>
+          </>
+        )
       )}
-      </>)}</TeamState>
       <DemoNote />
     </div>
   );
 }
 
-export function EmployeesScreen() {
-  const nav = useNav();
+/* ---------- Вкладка «Сотрудники» ---------- */
+
+export function StaffTab() {
   const [q, setQ] = useState('');
-  const { team, error } = useTeam();
+  const { team, blocked, error, live, reload } = useTeam();
   const list = (team ?? []).filter((e) => e.name.toLowerCase().includes(q.trim().toLowerCase()));
+
   return (
-    <div className="min-h-dvh px-5 pb-16">
-      <div className="pt-safe">
-        <div className="flex items-center gap-3 pt-5">
-          <BackButton onClick={nav.back} />
-          <h2 className="font-display" style={{ fontSize: 26 }}>Сотрудники</h2>
+    <div className="min-h-dvh px-5 pb-36">
+      <AdminHeader title="Сотрудники" />
+      {(team?.length ?? 0) > 3 && (
+        <div className="mt-5 flex items-center gap-2 rounded-2xl border border-black/5 bg-white px-4 py-3">
+          <Search size={16} className="text-black/40" />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Поиск по имени" className="w-full bg-transparent outline-none placeholder:text-black/35" style={{ fontSize: 16 }} />
         </div>
-      </div>
-      <div className="mt-5 flex items-center gap-2 rounded-2xl border border-black/5 bg-white px-4 py-3">
-        <Search size={16} className="text-black/40" />
-        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Поиск по имени" className="w-full bg-transparent outline-none placeholder:text-black/35" style={{ fontSize: 14 }} />
-      </div>
-      <TeamState team={team} error={error}>
-        {() => (
-          <div className="mt-4 space-y-2">
-            {list.map((e, i) => <EmployeeRow key={e.id} e={e} i={i} />)}
-          </div>
-        )}
-      </TeamState>
+      )}
+
+      {!team ? (
+        <Loading error={error} />
+      ) : (
+        <div className="mt-4 space-y-2">
+          {list.map((e, i) => <EmployeeRow key={e.id} e={e} i={i} />)}
+          {team.length === 0 && <p className="py-6 text-center" style={{ fontSize: 14, color: 'var(--muted)' }}>Пока никого нет</p>}
+        </div>
+      )}
+
+      <div className="mt-5"><InviteCard compact={(team?.length ?? 0) > 0} /></div>
+
+      {live && blocked.length > 0 && (
+        <Section title={`Удалённые · ${blocked.length}`}>
+          {blocked.map((b) => (
+            <div key={b.id} className="flex items-center gap-3 rounded-2xl border border-black/5 bg-white p-3 opacity-80">
+              <Avatar text={initials(b.name)} bg="#eee" size={40} />
+              <div className="min-w-0 flex-1">
+                <div className="truncate" style={{ fontWeight: 500 }}>{b.name}</div>
+                <div style={{ fontSize: 12, color: 'var(--muted)' }}>доступ закрыт {ago(b.at)}</div>
+              </div>
+              <button
+                onClick={async () => {
+                  if (!(await ask(`Вернуть доступ: ${b.name}? Она снова сможет открыть бота (прогресс начнётся заново).`))) return;
+                  await unblockMember(b.id).then(reload).catch((e: Error) => tell(e.message));
+                }}
+                className="shrink-0 rounded-full border border-black/10 px-3 py-2"
+                style={{ fontSize: 12 }}
+              >
+                Вернуть
+              </button>
+            </div>
+          ))}
+        </Section>
+      )}
+      <DemoNote />
     </div>
   );
 }
+
+function Section({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <div className="mt-7">
+      <div className="eyebrow">{title}</div>
+      <div className="mt-3 space-y-2">{children}</div>
+    </div>
+  );
+}
+
+/* ---------- Карточка сотрудницы ---------- */
 
 export function EmployeeScreen({ employeeId }: { employeeId: string }) {
   const nav = useNav();
@@ -191,7 +267,13 @@ export function EmployeeScreen({ employeeId }: { employeeId: string }) {
   const [editing, setEditing] = useState(false);
   const [role, setRole] = useState('');
   const e = team?.find((x) => x.id === employeeId);
-  if (!e) return null;
+  if (!e)
+    return (
+      <div className="min-h-dvh px-5 pt-safe">
+        <div className="pt-5"><BackButton onClick={nav.back} /></div>
+        <p className="mt-10 text-center" style={{ color: 'var(--muted)' }}>Сотрудница не найдена</p>
+      </div>
+    );
   const p = empProgress(e);
   const started = courses.filter((c) => (e.courses[c.id] ?? 0) > 0).length;
 
@@ -207,7 +289,7 @@ export function EmployeeScreen({ employeeId }: { employeeId: string }) {
       <motion.div {...stagger(0)} className="mt-5 rounded-3xl border border-black/5 bg-white p-5">
         <div className="flex items-center gap-4">
           <Avatar text={initials(e.name)} bg={e.avatar} size={64} />
-          <div>
+          <div className="min-w-0">
             <div style={{ fontWeight: 500, fontSize: 18 }}>{e.name}</div>
             <button
               disabled={!live}
@@ -244,6 +326,7 @@ export function EmployeeScreen({ employeeId }: { employeeId: string }) {
             onChange={(ev) => setRole(ev.target.value)}
             placeholder="Например, бровист"
             className="w-full rounded-2xl border border-black/10 px-4 py-3 outline-none focus:border-black"
+            style={{ fontSize: 16 }}
           />
           <PrimaryButton
             center
@@ -251,7 +334,7 @@ export function EmployeeScreen({ employeeId }: { employeeId: string }) {
               saveRole(Number(e.id), role.trim())
                 .then(reload)
                 .then(() => setEditing(false))
-                .catch(() => alert('Не удалось сохранить, попробуйте ещё раз'))
+                .catch(() => tell('Не удалось сохранить, попробуйте ещё раз'))
             }
           >
             Сохранить
@@ -293,6 +376,25 @@ export function EmployeeScreen({ employeeId }: { employeeId: string }) {
           );
         })}
       </div>
+
+      {live && (
+        <button
+          onClick={async () => {
+            if (!(await ask(`Удалить ${e.name} из бота? Её прогресс сотрётся, а войти снова она не сможет, пока вы не вернёте доступ.`))) return;
+            try {
+              await removeMember(Number(e.id));
+              await reload();
+              nav.back();
+            } catch (err) {
+              await tell((err as Error).message);
+            }
+          }}
+          className="mt-7 flex w-full items-center justify-center gap-2 rounded-2xl border border-red-500/20 bg-white p-4"
+          style={{ color: '#9a4848', fontWeight: 500 }}
+        >
+          <UserMinus size={16} /> Удалить из бота
+        </button>
+      )}
       <DemoNote />
     </div>
   );

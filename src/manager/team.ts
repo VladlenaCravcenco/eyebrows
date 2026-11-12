@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { courses } from '../content/courses';
-import { fetchTeam, type Member } from '../lib/sync';
+import { fetchTeam, type Blocked, type Member } from '../lib/sync';
 import { useStore } from '../lib/store';
 import { inTelegram } from '../lib/telegram';
 
@@ -57,28 +57,40 @@ export const empStatus = (e: Employee): 'done' | 'new' | 'active' => {
   return e.isNew ? 'new' : 'active';
 };
 
-// кэш, чтобы при переходах между экранами не мигала загрузка
-let cache: Employee[] | null = null;
+type TeamData = { team: Employee[]; blocked: Blocked[]; bot: string | null };
+
+// общий кэш для всех экранов кабинета, чтобы при переходах не мигала загрузка
+let cache: TeamData | null = null;
+const subs = new Set<(d: TeamData) => void>();
+
+const demoData: TeamData = { team: demo, blocked: [], bot: null };
 
 export function useTeam() {
   const s = useStore();
   const live = inTelegram && !!s.isManager;
-  const [team, setTeam] = useState<Employee[] | null>(live ? cache : demo);
+  const [data, setData] = useState<TeamData | null>(live ? cache : demoData);
   const [error, setError] = useState<string | null>(null);
 
   const reload = () =>
     fetchTeam()
-      .then((m) => {
-        cache = m.map(fromMember);
-        setTeam(cache);
+      .then((d) => {
+        cache = { team: d.team.map(fromMember), blocked: d.blocked, bot: d.bot };
+        subs.forEach((f) => f(cache!));
         setError(null);
       })
       .catch((e: Error) => setError(e.message));
 
   useEffect(() => {
-    if (live) void reload();
-    else setTeam(demo);
+    if (!live) {
+      setData(demoData);
+      return;
+    }
+    subs.add(setData);
+    void reload();
+    return () => {
+      subs.delete(setData);
+    };
   }, [live]);
 
-  return { team, error, live, reload };
+  return { team: data?.team ?? null, blocked: data?.blocked ?? [], bot: data?.bot ?? null, error, live, reload };
 }

@@ -1,16 +1,24 @@
-import { BookOpen, Home, Library, User } from 'lucide-react';
+import { BookOpen, Home, Library, PenLine, User, Users, LayoutDashboard } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useNav, type Tab } from '../lib/nav';
 import { haptic } from '../lib/telegram';
 
-const items: { id: Tab; label: string; Icon: typeof Home }[] = [
+type Item = { id: Tab; label: string; Icon: typeof Home };
+
+export const learnerTabs: Item[] = [
   { id: 'home', label: 'Главная', Icon: Home },
   { id: 'courses', label: 'Курсы', Icon: BookOpen },
   { id: 'knowledge', label: 'База', Icon: Library },
   { id: 'profile', label: 'Профиль', Icon: User },
 ];
 
-export function BottomNav({ active }: { active: Tab }) {
+export const adminTabs: Item[] = [
+  { id: 'team', label: 'Команда', Icon: LayoutDashboard },
+  { id: 'staff', label: 'Сотрудники', Icon: Users },
+  { id: 'texts', label: 'Тексты', Icon: PenLine },
+];
+
+export function BottomNav({ active, items }: { active: Tab; items: Item[] }) {
   const nav = useNav();
   return (
     <div className="pointer-events-none fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] px-4 pt-2" style={{ paddingBottom: 'max(var(--safe-bottom), 16px)' }}>

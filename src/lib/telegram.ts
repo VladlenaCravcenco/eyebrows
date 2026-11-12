@@ -14,6 +14,7 @@ type WebApp = {
   disableVerticalSwipes?: () => void;
   BackButton: { show(): void; hide(): void; onClick(cb: () => void): void; offClick(cb: () => void): void };
   showConfirm?: (message: string, cb: (ok: boolean) => void) => void;
+  openTelegramLink?: (url: string) => void;
   showAlert?: (message: string, cb?: () => void) => void;
   HapticFeedback?: {
     impactOccurred(style: 'light' | 'medium' | 'heavy' | 'rigid' | 'soft'): void;
@@ -72,4 +73,18 @@ export function tell(message: string): Promise<void> {
   if (inTelegram && wa?.showAlert) return new Promise((r) => wa.showAlert!(message, r));
   window.alert(message);
   return Promise.resolve();
+}
+
+/** Поделиться ссылкой: в Telegram — выбор чата, в браузере — системное меню или копирование */
+export async function shareLink(url: string, text: string) {
+  if (inTelegram && wa?.openTelegramLink) {
+    wa.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`);
+    return;
+  }
+  if (navigator.share) {
+    await navigator.share({ url, text }).catch(() => {});
+    return;
+  }
+  await navigator.clipboard?.writeText(`${text} ${url}`);
+  await tell('Ссылка скопирована');
 }

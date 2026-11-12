@@ -1,5 +1,5 @@
 // POST /api/bot — сюда Telegram присылает сообщения боту (вебхук)
-import { upsertUser } from './_lib/db.js';
+import { isBlocked, upsertUser } from './_lib/db.js';
 import { MANAGER_IDS, bot, json, openButton, webAppUrl, webhookSecret } from './_lib/telegram.js';
 
 export async function POST(request) {
@@ -18,6 +18,11 @@ export async function POST(request) {
       return json({ ok: true });
     }
 
+    if (!MANAGER_IDS.has(from.id) && (await isBlocked(from.id))) {
+      await bot('sendMessage', { chat_id: msg.chat.id, text: 'Доступ к обучению закрыт. Если это ошибка — напишите администратору студии.' });
+      return json({ ok: true });
+    }
+
     await upsertUser(
       { id: from.id, name: [from.first_name, from.last_name].filter(Boolean).join(' '), username: from.username },
       { chat_id: msg.chat.id },
@@ -26,7 +31,7 @@ export async function POST(request) {
     await bot('sendMessage', {
       chat_id: msg.chat.id,
       text: MANAGER_IDS.has(from.id)
-        ? `Здравствуйте, ${from.first_name}! Вы руководитель — в приложении откройте Профиль → «Режим руководителя», там прогресс всей команды.`
+        ? `Здравствуйте, ${from.first_name}! Это ваш кабинет руководителя: команда, прогресс девочек и редактор текстов. Откройте его кнопкой ниже 👇`
         : `Привет, ${from.first_name}! 👋\n\nЗдесь короткие уроки и мини-тесты о том, как у нас всё устроено в студии. Проходите в своём темпе — прогресс сохраняется.\n\nЖмите кнопку ниже 👇`,
       reply_markup: openButton(webAppUrl(request)),
     });

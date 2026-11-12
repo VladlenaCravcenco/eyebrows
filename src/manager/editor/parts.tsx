@@ -9,17 +9,19 @@ import { blankBlock, discard, publish, useDraft } from './draft';
 
 /* ---------- Каркас экрана редактора ---------- */
 
-export function EditorPage({ title, onBack, children, right }: { title: string; onBack: () => void; children: ReactNode; right?: ReactNode }) {
+export function EditorPage({ title, onBack, children, right, tab }: { title: string; onBack?: () => void; children: ReactNode; right?: ReactNode; tab?: boolean }) {
+  const { dirty } = useDraft();
   return (
     <div className="flex min-h-dvh flex-col" style={{ background: '#FAFAF8' }}>
       <div className="pt-safe sticky top-0 z-20 border-b border-black/5 bg-white/85 backdrop-blur-xl">
         <div className="flex items-center gap-3 px-5 py-3">
-          <BackButton onClick={onBack} />
+          {onBack && <BackButton onClick={onBack} />}
           <h2 className="min-w-0 flex-1 truncate" style={{ fontWeight: 500, fontSize: 17 }}>{title}</h2>
           {right}
         </div>
       </div>
-      <div className="flex-1 space-y-4 px-5 pb-10 pt-5">{children}</div>
+      {/* во вкладке снизу меню — оставляем под ним место */}
+      <div className={`flex-1 space-y-4 px-5 pt-5 ${tab && !dirty ? 'pb-36' : 'pb-10'}`}>{children}</div>
       <PublishBar />
     </div>
   );

@@ -5,7 +5,7 @@ import { findCourse } from '../content/courses';
 import { useNav } from '../lib/nav';
 import { actions, useStore } from '../lib/store';
 import { haptic } from '../lib/telegram';
-import { BottomBar, ContentBlock, PrimaryButton, StepHeader, stagger } from '../components/ui';
+import { BottomBar, ContentBlock, PrimaryButton, StepHeader, Watermark, stagger } from '../components/ui';
 
 export function LessonScreen({ courseId, lessonId }: { courseId: string; lessonId: string }) {
   const nav = useNav();
@@ -34,6 +34,7 @@ export function LessonScreen({ courseId, lessonId }: { courseId: string; lessonI
 
   return (
     <div className="flex min-h-dvh flex-col">
+      <Watermark />
       <StepHeader
         label={`${course.title} · Урок ${index + 1} из ${course.lessons.length}`}
         steps={course.lessons.length}

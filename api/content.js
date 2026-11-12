@@ -1,11 +1,13 @@
 // GET /api/content — актуальные курсы и база знаний (null → приложение берёт встроенные)
 // PUT /api/content — сохранить из редактора (только руководитель)
-import { getContent, saveContent } from './_lib/db.js';
+import { getContent, isBlocked, saveContent } from './_lib/db.js';
 import { cleanContent } from './_lib/content.js';
-import { auth, json, unauthorized } from './_lib/telegram.js';
+import { auth, blockedResponse, json, unauthorized } from './_lib/telegram.js';
 
 export async function GET(request) {
-  if (!auth(request)) return unauthorized();
+  const me = auth(request);
+  if (!me) return unauthorized();
+  if (!me.isManager && (await isBlocked(me.id))) return blockedResponse();
   return json({ content: await getContent() });
 }
 

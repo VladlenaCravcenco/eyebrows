@@ -78,3 +78,11 @@ export const json = (body, status = 200) =>
   });
 
 export const unauthorized = () => json({ error: 'Откройте приложение через Telegram-бота' }, 401);
+export const blockedResponse = () => json({ error: 'Доступ закрыт. Обратитесь к администратору студии.', blocked: true }, 403);
+
+/** Имя бота (для ссылки-приглашения) — запрашиваем один раз */
+let botUsername = null;
+export async function getBotUsername() {
+  if (!botUsername) botUsername = (await bot('getMe')).username;
+  return botUsername;
+}

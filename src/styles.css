@@ -40,3 +40,8 @@ input { font: inherit; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .press { transition: transform 0.15s ease; }
 .press:active { transform: scale(0.98); }
+
+/* Режим мастера: текст нельзя выделить и скопировать, картинки — сохранить долгим нажатием */
+html.protect body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+html.protect input, html.protect textarea { -webkit-user-select: text; user-select: text; }
+html.protect img { -webkit-user-drag: none; pointer-events: none; }

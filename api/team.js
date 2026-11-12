@@ -1,6 +1,6 @@
 // GET /api/team — вся команда (только руководитель)
-import { allUsers } from './_lib/db.js';
-import { MANAGER_IDS, auth, json, unauthorized } from './_lib/telegram.js';
+import { allUsers, blockedUsers } from './_lib/db.js';
+import { MANAGER_IDS, auth, getBotUsername, json, unauthorized } from './_lib/telegram.js';
 
 export async function GET(request) {
   const me = auth(request);
@@ -17,5 +17,6 @@ export async function GET(request) {
       lastActive: u.last_active,
       summary: u.summary,
     }));
-  return json({ team });
+  const bot = await getBotUsername().catch(() => null);
+  return json({ team, blocked: await blockedUsers(), bot });
 }

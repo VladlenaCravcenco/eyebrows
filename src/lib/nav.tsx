@@ -1,7 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import { setBackButton } from './telegram';
 
-export type Tab = 'home' | 'courses' | 'knowledge' | 'profile';
+/** вкладки мастера и вкладки кабинета руководителя */
+export type Tab = 'home' | 'courses' | 'knowledge' | 'profile' | 'team' | 'staff' | 'texts';
 
 export type Route =
   | { name: 'tab'; tab: Tab }
@@ -10,10 +11,7 @@ export type Route =
   | { name: 'quiz'; courseId: string }
   | { name: 'quizResult'; courseId: string; correct: number; total: number; before: number }
   | { name: 'doc'; docId: string }
-  | { name: 'manager' }
-  | { name: 'employees' }
   | { name: 'employee'; employeeId: string }
-  | { name: 'content' }
   | { name: 'editCourse'; courseId: string }
   | { name: 'editLesson'; courseId: string; lessonId: string }
   | { name: 'editQuestion'; courseId: string; index: number }
@@ -38,8 +36,8 @@ const Ctx = createContext<Nav | null>(null);
  * Простой стек экранов. Синхронизирован с кнопкой «назад» браузера / Android
  * и с BackButton в Telegram.
  */
-export function NavProvider({ children }: { children: ReactNode }) {
-  const [stack, setStack] = useState<Route[]>([{ name: 'tab', tab: 'home' }]);
+export function NavProvider({ children, initial = 'home' }: { children: ReactNode; initial?: Tab }) {
+  const [stack, setStack] = useState<Route[]>([{ name: 'tab', tab: initial }]);
   const [dir, setDir] = useState<1 | -1>(1);
   const stackRef = useRef(stack);
   stackRef.current = stack;

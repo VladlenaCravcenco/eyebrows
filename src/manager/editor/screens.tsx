@@ -30,7 +30,7 @@ export function ContentHomeScreen() {
   const { content } = useDraft();
 
   return (
-    <EditorPage title="Курсы и тексты" onBack={nav.back}>
+    <EditorPage title="Тексты" tab>
       <p style={{ fontSize: 13, color: 'var(--muted-2)', lineHeight: 1.5 }}>
         Правьте уроки, тесты и базу знаний. Изменения копятся в черновике — девочки увидят их после кнопки «Сохранить для всех».
         {!inTelegram && ' Сейчас демо-режим: сохранится только на этом устройстве.'}

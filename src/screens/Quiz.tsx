@@ -5,7 +5,7 @@ import { findCourse } from '../content/courses';
 import { useNav } from '../lib/nav';
 import { actions, overallProgress, useStore } from '../lib/store';
 import { haptic } from '../lib/telegram';
-import { BottomBar, PrimaryButton, StepHeader } from '../components/ui';
+import { BottomBar, PrimaryButton, StepHeader, Watermark } from '../components/ui';
 
 export function QuizScreen({ courseId }: { courseId: string }) {
   const nav = useNav();
@@ -44,6 +44,7 @@ export function QuizScreen({ courseId }: { courseId: string }) {
 
   return (
     <div className="flex min-h-dvh flex-col">
+      <Watermark />
       <StepHeader label={`Тест · Вопрос ${idx + 1} из ${total}`} steps={total} current={revealed ? idx + 1 : idx} onBack={nav.back} />
 
       <div className="flex-1 px-5 pb-10 pt-6">

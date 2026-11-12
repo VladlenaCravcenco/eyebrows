@@ -19,6 +19,10 @@ export type State = {
   joinedAt: string;
   /** выдаётся сервером; сам сервер всё равно проверяет права */
   isManager?: boolean;
+  /** руководитель удалил сотрудницу из бота */
+  blocked?: boolean;
+  /** вне Telegram: посмотреть кабинет руководителя на демо-данных */
+  demoAdmin?: boolean;
 };
 
 const KEY = 'eyebrows.progress.v1';
@@ -108,6 +112,12 @@ export const actions = {
   },
   logout() {
     set(empty());
+  },
+  setDemoAdmin(on: boolean) {
+    set({ demoAdmin: on });
+  },
+  setBlocked() {
+    set({ ...empty(), user: state.user, blocked: true });
   },
   /** Объединить прогресс с сервера с локальным: ничего пройденного не теряем */
   merge(remote: Partial<State> | null, patch: Partial<State> = {}) {

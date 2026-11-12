@@ -4,7 +4,7 @@ import { Book, ChevronRight, Package, Scale, Search, Shield, Sparkles, Wallet, X
 import { knowledgeBase, type Doc } from '../content/knowledge';
 import type { Block } from '../content/courses';
 import { useNav } from '../lib/nav';
-import { BackButton, ContentBlock, stagger } from '../components/ui';
+import { BackButton, ContentBlock, Watermark, stagger } from '../components/ui';
 
 export const docIcons = { book: Book, shield: Shield, package: Package, sparkles: Sparkles, wallet: Wallet, scale: Scale };
 
@@ -84,6 +84,7 @@ export function DocScreen({ docId }: { docId: string }) {
 
   return (
     <div className="min-h-dvh px-5 pb-16">
+      <Watermark />
       <div className="pt-safe">
         <div className="flex items-center gap-3 pt-5">
           <BackButton onClick={nav.back} />
