@@ -5,8 +5,15 @@
 //   user:<telegramId>  → JSON с данными сотрудницы и её прогрессом
 //   users              → множество всех telegramId
 
-const URL_ = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
-const TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+// Vercel добавляет к именам переменных выбранный префикс (KV_, STORAGE_ …),
+// поэтому ищем по окончанию имени.
+const findEnv = (suffix) =>
+  process.env[`KV_${suffix}`] ||
+  process.env[`UPSTASH_REDIS_${suffix}`] ||
+  Object.entries(process.env).find(([k, v]) => v && k.endsWith(suffix) && !k.includes('READ_ONLY'))?.[1];
+
+const URL_ = findEnv('REST_API_URL') || findEnv('REDIS_REST_URL');
+const TOKEN = findEnv('REST_API_TOKEN') || findEnv('REDIS_REST_TOKEN');
 
 async function redis(...commands) {
   if (!URL_ || !TOKEN) throw new Error('База не подключена: добавьте Upstash Redis в Vercel → Storage');
